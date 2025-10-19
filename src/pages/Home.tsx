@@ -36,9 +36,9 @@ const Home = () => {
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
-              <Link to="/compare">
+              <Link to="/portfolio">
                 <Button size="lg" variant="outline">
-                  Compare Investments
+                  Build Portfolio
                 </Button>
               </Link>
             </div>

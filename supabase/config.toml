@@ -1,1 +1,10 @@
 project_id = "ifikgxpbdcjferbcomjy"
+
+[functions.analyze-finances]
+verify_jwt = false
+
+[functions.compare-investments]
+verify_jwt = false
+
+[functions.yahoo-finance]
+verify_jwt = false

@@ -97,6 +97,81 @@ export type Database = {
         }
         Relationships: []
       }
+      user_holdings: {
+        Row: {
+          asset_type: string
+          average_price: number | null
+          created_at: string | null
+          current_price: number | null
+          id: string
+          name: string
+          profit_loss: number | null
+          profit_loss_percent: number | null
+          quantity: number
+          symbol: string
+          total_value: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          asset_type: string
+          average_price?: number | null
+          created_at?: string | null
+          current_price?: number | null
+          id?: string
+          name: string
+          profit_loss?: number | null
+          profit_loss_percent?: number | null
+          quantity?: number
+          symbol: string
+          total_value?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          asset_type?: string
+          average_price?: number | null
+          created_at?: string | null
+          current_price?: number | null
+          id?: string
+          name?: string
+          profit_loss?: number | null
+          profit_loss_percent?: number | null
+          quantity?: number
+          symbol?: string
+          total_value?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_portfolios: {
+        Row: {
+          created_at: string | null
+          id: string
+          investment_goal: string
+          risk_appetite: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          investment_goal: string
+          risk_appetite: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          investment_goal?: string
+          risk_appetite?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

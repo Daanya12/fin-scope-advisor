@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { TrendingUp, BarChart3, Home, Wallet, LogOut, LogIn } from "lucide-react";
+import { TrendingUp, BarChart3, Home, Wallet, LogOut, LogIn, PieChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,7 +37,7 @@ const Navigation = () => {
   const links = [
     { to: "/", label: "Home", icon: Home },
     { to: "/analyze", label: "Financial Health", icon: Wallet },
-    { to: "/compare", label: "Investments", icon: TrendingUp },
+    { to: "/portfolio", label: "Portfolio", icon: PieChart },
     { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
   ];
 
