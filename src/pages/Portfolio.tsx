@@ -9,8 +9,6 @@ import FinancialCard from "@/components/FinancialCard";
 import { useToast } from "@/hooks/use-toast";
 import PortfolioSetup from "@/components/portfolio/PortfolioSetup";
 import PortfolioTabs from "@/components/portfolio/PortfolioTabs";
-import PortfolioSettings from "@/components/portfolio/PortfolioSettings";
-import { Badge } from "@/components/ui/badge";
 
 interface Portfolio {
   id: string;
@@ -38,6 +36,7 @@ const Portfolio = () => {
   const [loading, setLoading] = useState(true);
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [holdings, setHoldings] = useState<Holding[]>([]);
+  const [settingUpPortfolio, setSettingUpPortfolio] = useState<'short-term' | 'long-term' | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -87,7 +86,7 @@ const Portfolio = () => {
   }, [navigate]);
 
   const handlePortfolioCreated = async () => {
-    // Refresh portfolios after creation
+    // Refresh portfolios and holdings after creation
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       const { data: portfolioData } = await supabase
@@ -98,22 +97,22 @@ const Portfolio = () => {
       if (portfolioData) {
         setPortfolios(portfolioData as Portfolio[]);
       }
+
+      // Fetch holdings
+      const { data: holdingsData } = await supabase
+        .from("user_holdings")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      if (holdingsData) {
+        setHoldings(holdingsData as Holding[]);
+      }
     }
+    setSettingUpPortfolio(null);
   };
 
-  const handleSettingsUpdate = async () => {
-    // Refresh portfolios after settings update
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      const { data: portfolioData } = await supabase
-        .from("user_portfolios")
-        .select("*")
-        .eq("user_id", session.user.id);
-
-      if (portfolioData) {
-        setPortfolios(portfolioData as Portfolio[]);
-      }
-    }
+  const handleSetupPortfolio = (portfolioType: 'short-term' | 'long-term') => {
+    setSettingUpPortfolio(portfolioType);
   };
 
   if (loading) {
@@ -126,17 +125,64 @@ const Portfolio = () => {
     );
   }
 
-  if (portfolios.length === 0) {
+  if (settingUpPortfolio) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <PortfolioSetup onComplete={handlePortfolioCreated} />
+          <Button 
+            variant="ghost" 
+            onClick={() => setSettingUpPortfolio(null)}
+            className="mb-4"
+          >
+            ← Back to Portfolios
+          </Button>
+          <PortfolioSetup 
+            portfolioType={settingUpPortfolio}
+            onComplete={handlePortfolioCreated} 
+          />
         </div>
       </div>
     );
   }
 
-  const riskAppetite = portfolios[0]?.risk_appetite || 'medium';
+  if (portfolios.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold">Investment Portfolio</h1>
+            <p className="text-lg text-muted-foreground">
+              Choose which portfolio to set up first
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="p-8 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => handleSetupPortfolio('short-term')}>
+              <h3 className="text-2xl font-bold mb-3">Short-term Portfolio</h3>
+              <p className="text-muted-foreground mb-6">
+                1-3 years timeframe. Perfect for tactical investments, saving for specific goals, or maintaining liquidity.
+              </p>
+              <Button size="lg">
+                <Plus className="w-4 h-4 mr-2" />
+                Get Started
+              </Button>
+            </Card>
+
+            <Card className="p-8 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => handleSetupPortfolio('long-term')}>
+              <h3 className="text-2xl font-bold mb-3">Long-term Portfolio</h3>
+              <p className="text-muted-foreground mb-6">
+                5+ years timeframe. Ideal for retirement planning, wealth building, and compound growth strategies.
+              </p>
+              <Button size="lg">
+                <Plus className="w-4 h-4 mr-2" />
+                Get Started
+              </Button>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -148,26 +194,13 @@ const Portfolio = () => {
               Manage your investments and track performance
             </p>
           </div>
-          <PortfolioSettings 
-            userId={user?.id || ''} 
-            currentRiskAppetite={riskAppetite}
-            onUpdate={handleSettingsUpdate}
-          />
         </div>
-
-        <Card className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-sm font-medium">Risk Profile:</span>
-            <Badge variant="secondary" className="capitalize">
-              {riskAppetite}
-            </Badge>
-          </div>
-        </Card>
 
         <PortfolioTabs 
           portfolios={portfolios}
           holdings={holdings}
           userId={user?.id || ''}
+          onSetupPortfolio={handleSetupPortfolio}
         />
       </div>
     </div>

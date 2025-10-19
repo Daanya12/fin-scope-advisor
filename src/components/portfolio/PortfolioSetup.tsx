@@ -8,10 +8,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, TrendingUp, Target, Shield } from "lucide-react";
 
 interface PortfolioSetupProps {
+  portfolioType: 'short-term' | 'long-term';
   onComplete: (portfolio: any) => void;
 }
 
-const PortfolioSetup = ({ onComplete }: PortfolioSetupProps) => {
+const PortfolioSetup = ({ portfolioType, onComplete }: PortfolioSetupProps) => {
   const [riskAppetite, setRiskAppetite] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -25,40 +26,26 @@ const PortfolioSetup = ({ onComplete }: PortfolioSetupProps) => {
       
       if (!user) throw new Error("Not authenticated");
 
-      // Create both short-term and long-term portfolios
-      const portfolios: {
-        user_id: string;
-        risk_appetite: string;
-        portfolio_type: 'short-term' | 'long-term';
-        name: string;
-      }[] = [
-        {
-          user_id: user.id,
-          risk_appetite: riskAppetite,
-          portfolio_type: 'short-term' as const,
-          name: 'Short-term Portfolio',
-        },
-        {
-          user_id: user.id,
-          risk_appetite: riskAppetite,
-          portfolio_type: 'long-term' as const,
-          name: 'Long-term Portfolio',
-        },
-      ];
-
+      // Create single portfolio
       const { data, error } = await supabase
         .from("user_portfolios")
-        .insert(portfolios)
-        .select();
+        .insert({
+          user_id: user.id,
+          risk_appetite: riskAppetite,
+          portfolio_type: portfolioType,
+          name: portfolioType === 'short-term' ? 'Short-term Portfolio' : 'Long-term Portfolio',
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
       toast({
-        title: "Portfolios Created!",
-        description: "Your short-term and long-term portfolios have been created.",
+        title: "Portfolio Created!",
+        description: `Your ${portfolioType} portfolio has been created.`,
       });
 
-      onComplete(data[0]);
+      onComplete(data);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -70,13 +57,27 @@ const PortfolioSetup = ({ onComplete }: PortfolioSetupProps) => {
     }
   };
 
+  const portfolioTitle = portfolioType === 'short-term' 
+    ? 'Short-term Portfolio (1-3 years)' 
+    : 'Long-term Portfolio (5+ years)';
+
+  const portfolioDescription = portfolioType === 'short-term'
+    ? 'Quick returns, higher liquidity, tactical investments'
+    : 'Wealth building, retirement planning, compound growth';
+
   return (
-    <FinancialCard title="Set Up Your Investment Portfolio" gradient>
+    <FinancialCard title={`Set Up ${portfolioTitle}`} gradient>
       <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="p-4 bg-muted/50 rounded-lg">
+          <p className="text-sm text-muted-foreground">
+            <strong>{portfolioTitle}</strong> - {portfolioDescription}
+          </p>
+        </div>
+
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <Shield className="w-6 h-6 text-primary" />
-            <Label className="text-lg font-semibold">What is your risk appetite?</Label>
+            <Label className="text-lg font-semibold">What is your risk appetite for this portfolio?</Label>
           </div>
           <RadioGroup value={riskAppetite} onValueChange={setRiskAppetite} required>
             <div className="space-y-3">
@@ -111,13 +112,6 @@ const PortfolioSetup = ({ onComplete }: PortfolioSetupProps) => {
           </RadioGroup>
         </div>
 
-        <div className="p-4 bg-muted/50 rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            We'll create two portfolios for you: one for <strong>short-term goals</strong> (1-3 years) 
-            and one for <strong>long-term goals</strong> (5+ years). You can manage them separately based on your needs.
-          </p>
-        </div>
-
         <Button
           type="submit"
           className="w-full gradient-primary text-primary-foreground"
@@ -126,12 +120,12 @@ const PortfolioSetup = ({ onComplete }: PortfolioSetupProps) => {
           {loading ? (
             <>
               <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-              Creating Portfolios...
+              Creating Portfolio...
             </>
           ) : (
             <>
               <TrendingUp className="mr-2 w-4 h-4" />
-              Create My Portfolios
+              Create Portfolio
             </>
           )}
         </Button>

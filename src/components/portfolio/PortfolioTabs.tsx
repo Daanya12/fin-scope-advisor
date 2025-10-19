@@ -1,4 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Plus } from "lucide-react";
 import PortfolioOverview from "./PortfolioOverview";
 import RecommendedAssets from "./RecommendedAssets";
 
@@ -27,9 +30,10 @@ interface PortfolioTabsProps {
   portfolios: Portfolio[];
   holdings: Holding[];
   userId: string;
+  onSetupPortfolio: (portfolioType: 'short-term' | 'long-term') => void;
 }
 
-const PortfolioTabs = ({ portfolios, holdings, userId }: PortfolioTabsProps) => {
+const PortfolioTabs = ({ portfolios, holdings, userId, onSetupPortfolio }: PortfolioTabsProps) => {
   const shortTermPortfolio = portfolios.find(p => p.portfolio_type === 'short-term');
   const longTermPortfolio = portfolios.find(p => p.portfolio_type === 'long-term');
 
@@ -60,9 +64,19 @@ const PortfolioTabs = ({ portfolios, holdings, userId }: PortfolioTabsProps) => 
             />
           </>
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            Short-term portfolio not found. Please contact support.
-          </div>
+          <Card className="p-12 text-center">
+            <div className="max-w-md mx-auto space-y-4">
+              <h3 className="text-2xl font-bold">Short-term Portfolio</h3>
+              <p className="text-muted-foreground">
+                Set up a short-term portfolio for tactical investments and goals within 1-3 years. 
+                Perfect for saving for a house, vacation, or other near-term objectives.
+              </p>
+              <Button onClick={() => onSetupPortfolio('short-term')} size="lg" className="mt-4">
+                <Plus className="w-4 h-4 mr-2" />
+                Get Started
+              </Button>
+            </div>
+          </Card>
         )}
       </TabsContent>
 
@@ -81,9 +95,19 @@ const PortfolioTabs = ({ portfolios, holdings, userId }: PortfolioTabsProps) => 
             />
           </>
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            Long-term portfolio not found. Please contact support.
-          </div>
+          <Card className="p-12 text-center">
+            <div className="max-w-md mx-auto space-y-4">
+              <h3 className="text-2xl font-bold">Long-term Portfolio</h3>
+              <p className="text-muted-foreground">
+                Build wealth over time with a long-term investment strategy (5+ years). 
+                Ideal for retirement planning, education funds, or building generational wealth.
+              </p>
+              <Button onClick={() => onSetupPortfolio('long-term')} size="lg" className="mt-4">
+                <Plus className="w-4 h-4 mr-2" />
+                Get Started
+              </Button>
+            </div>
+          </Card>
         )}
       </TabsContent>
     </Tabs>
