@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,6 +31,19 @@ export const SupportChat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleClearHistory = () => {
+    setMessages([
+      {
+        role: "assistant",
+        content: "Hi! I'm your AI assistant. How can I help you navigate the platform today?",
+      },
+    ]);
+    toast({
+      title: "Chat history cleared",
+      description: "Your conversation has been reset.",
+    });
+  };
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -74,9 +87,19 @@ export const SupportChat = () => {
       {/* Chat window */}
       {isOpen && (
         <Card className="fixed bottom-24 right-6 w-96 h-[500px] flex flex-col shadow-xl z-50">
-          <div className="p-4 border-b">
-            <h3 className="font-semibold">AI Support Assistant</h3>
-            <p className="text-xs text-muted-foreground">Ask me anything about the platform</p>
+          <div className="p-4 border-b flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold">AI Support Assistant</h3>
+              <p className="text-xs text-muted-foreground">Ask me anything about the platform</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClearHistory}
+              title="Clear chat history"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
