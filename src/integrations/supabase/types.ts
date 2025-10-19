@@ -97,6 +97,45 @@ export type Database = {
         }
         Relationships: []
       }
+      receipts: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          description: string | null
+          file_name: string
+          file_path: string
+          id: string
+          month: number
+          upload_date: string | null
+          user_id: string
+          year: number
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          description?: string | null
+          file_name: string
+          file_path: string
+          id?: string
+          month: number
+          upload_date?: string | null
+          user_id: string
+          year: number
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          month?: number
+          upload_date?: string | null
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       user_holdings: {
         Row: {
           asset_type: string

@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import MonthSelector from "@/components/MonthSelector";
+import { ReceiptUpload } from "@/components/ReceiptUpload";
 import {
   Accordion,
   AccordionContent,
@@ -292,6 +293,13 @@ const AnalyzeFinances = () => {
                   onChange={(e) => setFormData({ ...formData, expenses: e.target.value })}
                   required
                 />
+                <div className="mt-4">
+                  <ReceiptUpload
+                    month={selectedMonth.month}
+                    year={selectedMonth.year}
+                    userId={user?.id}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
