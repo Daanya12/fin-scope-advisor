@@ -14,7 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      financial_analyses: {
+        Row: {
+          created_at: string | null
+          credit_score: number
+          credit_utilization: number | null
+          debt_amount: number
+          debt_to_income_ratio: number | null
+          financial_score: number
+          id: string
+          monthly_available: number | null
+          monthly_expenses: number
+          monthly_income: number
+          recommendations: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credit_score: number
+          credit_utilization?: number | null
+          debt_amount: number
+          debt_to_income_ratio?: number | null
+          financial_score: number
+          id?: string
+          monthly_available?: number | null
+          monthly_expenses: number
+          monthly_income: number
+          recommendations?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credit_score?: number
+          credit_utilization?: number | null
+          debt_amount?: number
+          debt_to_income_ratio?: number | null
+          financial_score?: number
+          id?: string
+          monthly_available?: number | null
+          monthly_expenses?: number
+          monthly_income?: number
+          recommendations?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_analyses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
