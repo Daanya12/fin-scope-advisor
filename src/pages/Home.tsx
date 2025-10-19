@@ -25,7 +25,7 @@ const Home = () => {
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              FinScope connects your credit health with investment decisions. Get AI-powered insights
+              Lunex connects your credit health with investment decisions. Get AI-powered insights
               that help you understand how your financial habits impact your investment opportunities.
             </p>
 
@@ -50,7 +50,7 @@ const Home = () => {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Why FinScope is Different</h2>
+            <h2 className="text-3xl font-bold mb-4">Why Lunex is Different</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Most tools show you either credit or investments. We show you how they work together.
             </p>

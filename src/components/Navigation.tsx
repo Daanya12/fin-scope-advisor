@@ -21,7 +21,7 @@ const Navigation = () => {
               <BarChart3 className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              FinScope
+              Lunex
             </span>
           </Link>
 
