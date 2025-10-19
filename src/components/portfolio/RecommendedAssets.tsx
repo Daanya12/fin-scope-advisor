@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import FinancialCard from "@/components/FinancialCard";
-import { Button } from "@/components/ui/button";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, TrendingUp, TrendingDown, Plus } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Asset {
@@ -54,12 +54,6 @@ const RecommendedAssets = ({ riskAppetite, portfolioType, userId }: RecommendedA
     fetchRecommendations();
   }, [riskAppetite, portfolioType, toast]);
 
-  const handleAddToPortfolio = async (asset: Asset) => {
-    toast({
-      title: "Coming Soon",
-      description: "IG.com trading integration will be added soon. For now, use this as investment research.",
-    });
-  };
 
   if (loading) {
     return (
@@ -92,33 +86,19 @@ const RecommendedAssets = ({ riskAppetite, portfolioType, userId }: RecommendedA
                 </Badge>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold">${asset.price.toFixed(2)}</div>
-                  <div className={`flex items-center gap-1 text-sm ${
-                    asset.changePercent >= 0 ? 'text-success' : 'text-destructive'
-                  }`}>
-                    {asset.changePercent >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                    <span>{Math.abs(asset.changePercent).toFixed(2)}%</span>
-                  </div>
+              <div>
+                <div className="text-2xl font-bold">${asset.price.toFixed(2)}</div>
+                <div className={`flex items-center gap-1 text-sm ${
+                  asset.changePercent >= 0 ? 'text-success' : 'text-destructive'
+                }`}>
+                  {asset.changePercent >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                  <span>{Math.abs(asset.changePercent).toFixed(2)}%</span>
                 </div>
-
-                <Button 
-                  size="sm" 
-                  onClick={() => handleAddToPortfolio(asset)}
-                  className="gradient-primary"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Invest
-                </Button>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground">
-          <strong>Note:</strong> IG.com trading integration coming soon. These recommendations are for research purposes.
-        </div>
       </div>
     </FinancialCard>
   );
