@@ -7,6 +7,12 @@ import FinancialCard from "@/components/FinancialCard";
 import HealthMeter from "@/components/HealthMeter";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface AnalysisResult {
   healthScore: number;
@@ -66,6 +72,92 @@ const AnalyzeFinances = () => {
             Enter your financial information to get personalized insights and recommendations
           </p>
         </div>
+
+        <FinancialCard title="Understanding Your Financial Metrics" className="bg-card">
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="health-score">
+              <AccordionTrigger className="text-left">
+                What is a Financial Health Score?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>
+                  Your Financial Health Score is a comprehensive measure of your overall financial wellbeing, ranging from 0 to 100. It considers multiple factors including your income, expenses, debt levels, and credit management.
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong>80-100:</strong> Excellent financial health - strong savings, low debt, good credit management</li>
+                  <li><strong>60-79:</strong> Good financial health - manageable debt, positive cash flow, room for improvement</li>
+                  <li><strong>Below 60:</strong> Needs attention - consider reviewing spending, reducing debt, or increasing income</li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="credit-score">
+              <AccordionTrigger className="text-left">
+                What is a Credit Score and How Does It Work?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>
+                  A credit score is a three-digit number (typically 300-850) that represents your creditworthiness - how likely you are to repay borrowed money. Lenders use this score to decide whether to approve loans and at what interest rate.
+                </p>
+                <p><strong>Credit Score Ranges:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong>800-850:</strong> Exceptional - best loan terms and lowest interest rates</li>
+                  <li><strong>740-799:</strong> Very Good - excellent loan approval rates</li>
+                  <li><strong>670-739:</strong> Good - favorable loan terms from most lenders</li>
+                  <li><strong>580-669:</strong> Fair - may face higher interest rates</li>
+                  <li><strong>Below 580:</strong> Poor - difficult to obtain credit, high interest rates</li>
+                </ul>
+                <p className="mt-2">
+                  Your credit score is influenced by payment history, credit utilization, length of credit history, types of credit, and recent credit inquiries.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="debt-to-income">
+              <AccordionTrigger className="text-left">
+                What is Debt-to-Income Ratio?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>
+                  Your Debt-to-Income (DTI) ratio compares your total monthly debt payments to your gross monthly income. It's expressed as a percentage and shows how much of your income goes toward paying debts.
+                </p>
+                <p><strong>Formula:</strong> (Total Monthly Debt ÷ Gross Monthly Income) × 100</p>
+                <p><strong>What the numbers mean:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong>Below 20%:</strong> Excellent - you have significant financial flexibility</li>
+                  <li><strong>20-36%:</strong> Good - manageable debt levels</li>
+                  <li><strong>37-43%:</strong> Adequate - consider reducing debt when possible</li>
+                  <li><strong>Above 43%:</strong> High - may struggle to get approved for loans</li>
+                </ul>
+                <p className="mt-2">
+                  Lenders prefer DTI ratios below 36%, with no more than 28% going toward housing costs.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="credit-utilization">
+              <AccordionTrigger className="text-left">
+                What is Credit Utilization?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground space-y-2">
+                <p>
+                  Credit Utilization is the percentage of your available credit that you're currently using. It's one of the most important factors affecting your credit score.
+                </p>
+                <p><strong>Formula:</strong> (Total Credit Card Balances ÷ Total Credit Limits) × 100</p>
+                <p><strong>Recommended ranges:</strong></p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong>Below 10%:</strong> Excellent - shows strong credit management</li>
+                  <li><strong>10-30%:</strong> Good - generally won't negatively impact your score</li>
+                  <li><strong>30-50%:</strong> Fair - may lower your credit score</li>
+                  <li><strong>Above 50%:</strong> Poor - can significantly damage your credit score</li>
+                </ul>
+                <p className="mt-2">
+                  <strong>Tip:</strong> Keeping your utilization below 30% across all cards, and ideally below 10%, helps maintain a strong credit score.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </FinancialCard>
 
         <FinancialCard title="Your Financial Information" gradient>
           <form onSubmit={handleSubmit} className="space-y-6">
