@@ -8,12 +8,15 @@ import { Loader2, TrendingUp, DollarSign, PieChart, Plus } from "lucide-react";
 import FinancialCard from "@/components/FinancialCard";
 import { useToast } from "@/hooks/use-toast";
 import PortfolioSetup from "@/components/portfolio/PortfolioSetup";
-import PortfolioOverview from "@/components/portfolio/PortfolioOverview";
-import RecommendedAssets from "@/components/portfolio/RecommendedAssets";
+import PortfolioTabs from "@/components/portfolio/PortfolioTabs";
+import PortfolioSettings from "@/components/portfolio/PortfolioSettings";
+import { Badge } from "@/components/ui/badge";
 
 interface Portfolio {
+  id: string;
   risk_appetite: string;
-  investment_goal: string;
+  portfolio_type: string;
+  name: string;
 }
 
 interface Holding {
@@ -27,12 +30,13 @@ interface Holding {
   total_value: number;
   profit_loss: number;
   profit_loss_percent: number;
+  portfolio_id: string | null;
 }
 
 const Portfolio = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -48,15 +52,14 @@ const Portfolio = () => {
 
       setUser(session.user);
 
-      // Fetch portfolio preferences
+      // Fetch all portfolios (short-term and long-term)
       const { data: portfolioData } = await supabase
         .from("user_portfolios")
         .select("*")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
+        .eq("user_id", session.user.id);
 
-      if (portfolioData) {
-        setPortfolio(portfolioData as Portfolio);
+      if (portfolioData && portfolioData.length > 0) {
+        setPortfolios(portfolioData as Portfolio[]);
         
         // Fetch holdings
         const { data: holdingsData } = await supabase
@@ -83,8 +86,34 @@ const Portfolio = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handlePortfolioCreated = (newPortfolio: Portfolio) => {
-    setPortfolio(newPortfolio);
+  const handlePortfolioCreated = async () => {
+    // Refresh portfolios after creation
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: portfolioData } = await supabase
+        .from("user_portfolios")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      if (portfolioData) {
+        setPortfolios(portfolioData as Portfolio[]);
+      }
+    }
+  };
+
+  const handleSettingsUpdate = async () => {
+    // Refresh portfolios after settings update
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: portfolioData } = await supabase
+        .from("user_portfolios")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      if (portfolioData) {
+        setPortfolios(portfolioData as Portfolio[]);
+      }
+    }
   };
 
   if (loading) {
@@ -97,7 +126,7 @@ const Portfolio = () => {
     );
   }
 
-  if (!portfolio) {
+  if (portfolios.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -107,25 +136,37 @@ const Portfolio = () => {
     );
   }
 
+  const riskAppetite = portfolios[0]?.risk_appetite || 'medium';
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Investment Portfolio</h1>
-          <p className="text-lg text-muted-foreground">
-            Manage your investments and track performance
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold">Investment Portfolio</h1>
+            <p className="text-lg text-muted-foreground">
+              Manage your investments and track performance
+            </p>
+          </div>
+          <PortfolioSettings 
+            userId={user?.id || ''} 
+            currentRiskAppetite={riskAppetite}
+            onUpdate={handleSettingsUpdate}
+          />
         </div>
 
-        <PortfolioOverview 
-          holdings={holdings} 
-          riskAppetite={portfolio.risk_appetite}
-          investmentGoal={portfolio.investment_goal}
-        />
+        <Card className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-sm font-medium">Risk Profile:</span>
+            <Badge variant="secondary" className="capitalize">
+              {riskAppetite}
+            </Badge>
+          </div>
+        </Card>
 
-        <RecommendedAssets 
-          riskAppetite={portfolio.risk_appetite}
-          investmentGoal={portfolio.investment_goal}
+        <PortfolioTabs 
+          portfolios={portfolios}
+          holdings={holdings}
           userId={user?.id || ''}
         />
       </div>

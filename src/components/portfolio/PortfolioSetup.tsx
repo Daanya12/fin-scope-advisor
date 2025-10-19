@@ -13,7 +13,6 @@ interface PortfolioSetupProps {
 
 const PortfolioSetup = ({ onComplete }: PortfolioSetupProps) => {
   const [riskAppetite, setRiskAppetite] = useState<string>("");
-  const [investmentGoal, setInvestmentGoal] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -26,24 +25,40 @@ const PortfolioSetup = ({ onComplete }: PortfolioSetupProps) => {
       
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
-        .from("user_portfolios")
-        .insert({
+      // Create both short-term and long-term portfolios
+      const portfolios: {
+        user_id: string;
+        risk_appetite: string;
+        portfolio_type: 'short-term' | 'long-term';
+        name: string;
+      }[] = [
+        {
           user_id: user.id,
           risk_appetite: riskAppetite,
-          investment_goal: investmentGoal,
-        })
-        .select()
-        .single();
+          portfolio_type: 'short-term' as const,
+          name: 'Short-term Portfolio',
+        },
+        {
+          user_id: user.id,
+          risk_appetite: riskAppetite,
+          portfolio_type: 'long-term' as const,
+          name: 'Long-term Portfolio',
+        },
+      ];
+
+      const { data, error } = await supabase
+        .from("user_portfolios")
+        .insert(portfolios)
+        .select();
 
       if (error) throw error;
 
       toast({
-        title: "Portfolio Created!",
-        description: "Your investment preferences have been saved.",
+        title: "Portfolios Created!",
+        description: "Your short-term and long-term portfolios have been created.",
       });
 
-      onComplete(data);
+      onComplete(data[0]);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -96,49 +111,27 @@ const PortfolioSetup = ({ onComplete }: PortfolioSetupProps) => {
           </RadioGroup>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <Target className="w-6 h-6 text-primary" />
-            <Label className="text-lg font-semibold">What is your investment goal?</Label>
-          </div>
-          <RadioGroup value={investmentGoal} onValueChange={setInvestmentGoal} required>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                <RadioGroupItem value="short-term" id="short-term" />
-                <Label htmlFor="short-term" className="cursor-pointer flex-1">
-                  <div className="font-semibold">Short-term (1-3 years)</div>
-                  <div className="text-sm text-muted-foreground">
-                    Quick returns, higher liquidity, tactical investments
-                  </div>
-                </Label>
-              </div>
-              <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                <RadioGroupItem value="long-term" id="long-term" />
-                <Label htmlFor="long-term" className="cursor-pointer flex-1">
-                  <div className="font-semibold">Long-term (5+ years)</div>
-                  <div className="text-sm text-muted-foreground">
-                    Wealth building, retirement planning, compound growth
-                  </div>
-                </Label>
-              </div>
-            </div>
-          </RadioGroup>
+        <div className="p-4 bg-muted/50 rounded-lg">
+          <p className="text-sm text-muted-foreground">
+            We'll create two portfolios for you: one for <strong>short-term goals</strong> (1-3 years) 
+            and one for <strong>long-term goals</strong> (5+ years). You can manage them separately based on your needs.
+          </p>
         </div>
 
         <Button
           type="submit"
           className="w-full gradient-primary text-primary-foreground"
-          disabled={loading || !riskAppetite || !investmentGoal}
+          disabled={loading || !riskAppetite}
         >
           {loading ? (
             <>
               <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-              Creating Portfolio...
+              Creating Portfolios...
             </>
           ) : (
             <>
               <TrendingUp className="mr-2 w-4 h-4" />
-              Create My Portfolio
+              Create My Portfolios
             </>
           )}
         </Button>

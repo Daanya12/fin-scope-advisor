@@ -17,11 +17,11 @@ interface Asset {
 
 interface RecommendedAssetsProps {
   riskAppetite: string;
-  investmentGoal: string;
+  portfolioType: string;
   userId: string;
 }
 
-const RecommendedAssets = ({ riskAppetite, investmentGoal, userId }: RecommendedAssetsProps) => {
+const RecommendedAssets = ({ riskAppetite, portfolioType, userId }: RecommendedAssetsProps) => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -33,7 +33,7 @@ const RecommendedAssets = ({ riskAppetite, investmentGoal, userId }: Recommended
           body: {
             action: 'recommendations',
             riskAppetite,
-            investmentGoal,
+            portfolioType,
           },
         });
 
@@ -52,7 +52,7 @@ const RecommendedAssets = ({ riskAppetite, investmentGoal, userId }: Recommended
     };
 
     fetchRecommendations();
-  }, [riskAppetite, investmentGoal, toast]);
+  }, [riskAppetite, portfolioType, toast]);
 
   const handleAddToPortfolio = async (asset: Asset) => {
     toast({
@@ -75,7 +75,8 @@ const RecommendedAssets = ({ riskAppetite, investmentGoal, userId }: Recommended
     <FinancialCard title="Recommended Assets" gradient>
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Based on your {riskAppetite} risk appetite and {investmentGoal} goals
+          Based on your <span className="font-medium capitalize">{riskAppetite}</span> risk profile 
+          and <span className="font-medium">{portfolioType === 'short-term' ? 'short-term' : 'long-term'}</span> investment horizon
         </p>
         
         <div className="grid md:grid-cols-2 gap-4">

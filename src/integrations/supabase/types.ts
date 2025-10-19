@@ -144,6 +144,7 @@ export type Database = {
           current_price: number | null
           id: string
           name: string
+          portfolio_id: string | null
           profit_loss: number | null
           profit_loss_percent: number | null
           quantity: number
@@ -159,6 +160,7 @@ export type Database = {
           current_price?: number | null
           id?: string
           name: string
+          portfolio_id?: string | null
           profit_loss?: number | null
           profit_loss_percent?: number | null
           quantity?: number
@@ -174,6 +176,7 @@ export type Database = {
           current_price?: number | null
           id?: string
           name?: string
+          portfolio_id?: string | null
           profit_loss?: number | null
           profit_loss_percent?: number | null
           quantity?: number
@@ -182,13 +185,22 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_holdings_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "user_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_portfolios: {
         Row: {
           created_at: string | null
           id: string
-          investment_goal: string
+          name: string | null
+          portfolio_type: Database["public"]["Enums"]["portfolio_type"]
           risk_appetite: string
           updated_at: string | null
           user_id: string
@@ -196,7 +208,8 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
-          investment_goal: string
+          name?: string | null
+          portfolio_type?: Database["public"]["Enums"]["portfolio_type"]
           risk_appetite: string
           updated_at?: string | null
           user_id: string
@@ -204,7 +217,8 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
-          investment_goal?: string
+          name?: string | null
+          portfolio_type?: Database["public"]["Enums"]["portfolio_type"]
           risk_appetite?: string
           updated_at?: string | null
           user_id?: string
@@ -219,7 +233,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      portfolio_type: "short-term" | "long-term"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -346,6 +360,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      portfolio_type: ["short-term", "long-term"],
+    },
   },
 } as const

@@ -13,7 +13,7 @@ serve(async (req) => {
   try {
     // Read body once and reuse it
     const body = await req.json();
-    const { symbols, action, query, riskAppetite, investmentGoal } = body;
+    const { symbols, action, query, riskAppetite, portfolioType } = body;
 
     if (action === 'quote') {
       // Get current quotes for symbols
@@ -77,21 +77,21 @@ serve(async (req) => {
     }
 
     if (action === 'recommendations') {
-      // Define recommendation pools based on risk and goals
+      // Define recommendation pools based on risk and portfolio type
       let symbolPool: string[] = [];
       
       if (riskAppetite === 'low') {
-        symbolPool = investmentGoal === 'short-term' 
-          ? ['BND', 'VCSH', 'SHY', 'AGG', 'GOVT'] // Low risk short-term
-          : ['VOO', 'VTI', 'BND', 'VIG', 'SCHD']; // Low risk long-term
+        symbolPool = portfolioType === 'short-term' 
+          ? ['BND', 'VCSH', 'SHY', 'AGG', 'GOVT'] // Low risk short-term: bonds and treasury
+          : ['VOO', 'VTI', 'BND', 'VIG', 'SCHD']; // Low risk long-term: conservative with dividends
       } else if (riskAppetite === 'medium') {
-        symbolPool = investmentGoal === 'short-term'
-          ? ['SPY', 'IWM', 'QQQ', 'DIA', 'VEA'] // Medium risk short-term
-          : ['VTI', 'VOO', 'VXUS', 'VEA', 'VWO']; // Medium risk long-term
+        symbolPool = portfolioType === 'short-term'
+          ? ['SPY', 'IWM', 'QQQ', 'DIA', 'VEA'] // Medium risk short-term: balanced
+          : ['VTI', 'VOO', 'VXUS', 'VEA', 'VWO']; // Medium risk long-term: diversified
       } else {
-        symbolPool = investmentGoal === 'short-term'
-          ? ['QQQ', 'ARKK', 'TSLA', 'NVDA', 'AMD'] // High risk short-term
-          : ['QQQ', 'VUG', 'ARKK', 'TSLA', 'NVDA', 'MSFT', 'GOOGL']; // High risk long-term
+        symbolPool = portfolioType === 'short-term'
+          ? ['QQQ', 'ARKK', 'TSLA', 'NVDA', 'AMD'] // High risk short-term: growth
+          : ['QQQ', 'VUG', 'ARKK', 'TSLA', 'NVDA', 'MSFT', 'GOOGL']; // High risk long-term: aggressive tech
       }
 
       // Fetch quotes for recommended symbols

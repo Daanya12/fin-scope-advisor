@@ -15,10 +15,10 @@ interface Holding {
 interface PortfolioOverviewProps {
   holdings: Holding[];
   riskAppetite: string;
-  investmentGoal: string;
+  portfolioType: string;
 }
 
-const PortfolioOverview = ({ holdings, riskAppetite, investmentGoal }: PortfolioOverviewProps) => {
+const PortfolioOverview = ({ holdings, riskAppetite, portfolioType }: PortfolioOverviewProps) => {
   const totalValue = holdings.reduce((sum, h) => sum + h.total_value, 0);
   const totalProfitLoss = holdings.reduce((sum, h) => sum + h.profit_loss, 0);
   const totalProfitLossPercent = totalValue > 0 ? (totalProfitLoss / (totalValue - totalProfitLoss)) * 100 : 0;
@@ -57,15 +57,15 @@ const PortfolioOverview = ({ holdings, riskAppetite, investmentGoal }: Portfolio
         </div>
       </FinancialCard>
 
-      <FinancialCard title="Investment Goal" gradient>
+      <FinancialCard title="Portfolio Type" gradient>
         <div className="space-y-4">
           <Target className="w-8 h-8 text-primary" />
           <div>
             <Badge className="bg-primary/10 text-primary">
-              {investmentGoal === 'short-term' ? 'SHORT-TERM' : 'LONG-TERM'}
+              {portfolioType === 'short-term' ? 'SHORT-TERM' : 'LONG-TERM'}
             </Badge>
             <div className="text-sm text-muted-foreground mt-2">
-              {investmentGoal === 'short-term' ? '1-3 years' : '5+ years'}
+              {portfolioType === 'short-term' ? '1-3 years' : '5+ years'}
             </div>
           </div>
         </div>
