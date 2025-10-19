@@ -97,8 +97,9 @@ export const SupportChat = () => {
               size="icon"
               onClick={handleClearHistory}
               title="Clear chat history"
+              className="hover:bg-destructive/10"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-5 h-5 text-muted-foreground hover:text-destructive" />
             </Button>
           </div>
 
