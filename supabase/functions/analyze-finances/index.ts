@@ -97,7 +97,7 @@ Format your response as JSON with this structure:
     }
 
     // Construct response
-    const result = {
+    const result: any = {
       healthScore: analysis.healthScore,
       creditScore: userCreditScore || analysis.estimatedCreditScore,
       debtToIncomeRatio: parseFloat(debtToIncomeRatio),
@@ -105,6 +105,77 @@ Format your response as JSON with this structure:
       insights: analysis.insights,
       recommendations: analysis.recommendations,
     };
+
+    // Generate investment recommendations if user has disposable income
+    if (disposableIncome > 0) {
+      const investmentPrompt = `Based on this financial profile, provide personalized investment recommendations:
+
+Financial Situation:
+- Monthly Disposable Income: £${disposableIncome}
+- Financial Health Score: ${analysis.healthScore}/100
+- Credit Score: ${userCreditScore || analysis.estimatedCreditScore}
+- Debt Level: £${totalDebt}
+- Debt-to-Income Ratio: ${debtToIncomeRatio}%
+
+Provide 2-3 investment recommendation categories covering different risk levels and time horizons. For each category:
+1. Category name (e.g., "Conservative Growth Portfolio", "Aggressive Tech & Innovation")
+2. Risk level (low/medium/high)
+3. Time horizon (e.g., "1-3 years", "5-10 years", "10+ years")
+4. Reasoning why this suits their profile
+5. 3-5 specific investment suggestions (stocks, ETFs, commodities, bonds)
+
+Consider their current financial health - if they have high debt, suggest more conservative options first.
+If they have strong financial health, include more aggressive growth options.
+
+Format as JSON:
+{
+  "recommendations": [
+    {
+      "category": string,
+      "riskLevel": "low" | "medium" | "high",
+      "timeHorizon": string,
+      "reasoning": string,
+      "suggestions": [string]
+    }
+  ]
+}`;
+
+      const investmentResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a financial investment advisor. Provide specific, actionable investment recommendations. Always respond with valid JSON only.'
+            },
+            {
+              role: 'user',
+              content: investmentPrompt
+            }
+          ],
+          temperature: 0.7,
+        }),
+      });
+
+      if (investmentResponse.ok) {
+        const investmentData = await investmentResponse.json();
+        const investmentContent = investmentData.choices[0].message.content;
+        
+        try {
+          const cleanInvestmentContent = investmentContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          const investmentAnalysis = JSON.parse(cleanInvestmentContent);
+          result.investmentRecommendations = investmentAnalysis.recommendations;
+        } catch (parseError) {
+          console.error('Error parsing investment recommendations:', investmentContent);
+          // Don't fail the entire request if investment recommendations fail
+        }
+      }
+    }
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -21,7 +21,16 @@ interface FinancialAnalysis {
   recommendations: {
     insights: string[];
     actions: string[];
+    investments?: InvestmentRecommendation[];
   };
+}
+
+interface InvestmentRecommendation {
+  category: string;
+  suggestions: string[];
+  riskLevel: "low" | "medium" | "high";
+  timeHorizon: string;
+  reasoning: string;
 }
 
 const Dashboard = () => {
@@ -203,6 +212,44 @@ const Dashboard = () => {
                 </li>
               ))}
             </ul>
+          </FinancialCard>
+        )}
+
+        {analysis.recommendations?.investments && analysis.recommendations.investments.length > 0 && (
+          <FinancialCard title="Your Investment Recommendations" gradient>
+            <div className="space-y-6">
+              {analysis.recommendations.investments.map((inv, index) => (
+                <div key={index} className="border border-border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg">{inv.category}</h3>
+                    <div className="flex gap-2">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        inv.riskLevel === "low" ? "bg-success/10 text-success" :
+                        inv.riskLevel === "medium" ? "bg-warning/10 text-warning" :
+                        "bg-destructive/10 text-destructive"
+                      }`}>
+                        {inv.riskLevel.toUpperCase()} RISK
+                      </span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent">
+                        {inv.timeHorizon}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{inv.reasoning}</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Suggested investments:</p>
+                    <ul className="space-y-1">
+                      {inv.suggestions.map((suggestion, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                          <span>{suggestion}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
           </FinancialCard>
         )}
       </div>

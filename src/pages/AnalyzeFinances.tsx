@@ -16,6 +16,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+interface InvestmentRecommendation {
+  category: string;
+  suggestions: string[];
+  riskLevel: "low" | "medium" | "high";
+  timeHorizon: string;
+  reasoning: string;
+}
+
 interface AnalysisResult {
   healthScore: number;
   creditScore: number;
@@ -23,6 +31,7 @@ interface AnalysisResult {
   creditUtilization: number;
   insights: string[];
   recommendations: string[];
+  investmentRecommendations?: InvestmentRecommendation[];
 }
 
 const AnalyzeFinances = () => {
@@ -82,7 +91,8 @@ const AnalyzeFinances = () => {
             monthly_available: monthlyAvailable,
             recommendations: {
               insights: data.insights,
-              actions: data.recommendations
+              actions: data.recommendations,
+              investments: data.investmentRecommendations || []
             }
           });
 
@@ -176,6 +186,23 @@ const AnalyzeFinances = () => {
                   Your Debt-to-Income (DTI) ratio compares your total monthly debt payments to your gross monthly income. It's expressed as a percentage and shows how much of your income goes toward paying debts.
                 </p>
                 <p><strong>Formula:</strong> (Total Monthly Debt ÷ Gross Monthly Income) × 100</p>
+                <p><strong>Important: Understanding "Debt" in Financial Health</strong></p>
+                <div className="bg-muted/50 p-3 rounded-lg space-y-2">
+                  <p className="font-semibold">High-Risk Debt (include in calculations):</p>
+                  <ul className="list-disc list-inside space-y-1 ml-2">
+                    <li>Credit card balances</li>
+                    <li>Personal loans</li>
+                    <li>Payday loans</li>
+                    <li>Car loans (especially high-interest)</li>
+                    <li>Student loans with high interest rates</li>
+                  </ul>
+                  <p className="font-semibold mt-2">Healthy Debt (generally lower risk):</p>
+                  <ul className="list-disc list-inside space-y-1 ml-2">
+                    <li>Mortgages (considered investment in property)</li>
+                    <li>Low-interest student loans</li>
+                    <li>Business loans generating revenue</li>
+                  </ul>
+                </div>
                 <p><strong>What the numbers mean:</strong></p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li><strong>Below 20%:</strong> Excellent - you have significant financial flexibility</li>
@@ -327,6 +354,44 @@ const AnalyzeFinances = () => {
                 ))}
               </ul>
             </FinancialCard>
+
+            {result.investmentRecommendations && result.investmentRecommendations.length > 0 && (
+              <FinancialCard title="Personalized Investment Recommendations" gradient>
+                <div className="space-y-6">
+                  {result.investmentRecommendations.map((inv, index) => (
+                    <div key={index} className="border border-border rounded-lg p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-lg">{inv.category}</h3>
+                        <div className="flex gap-2">
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            inv.riskLevel === "low" ? "bg-success/10 text-success" :
+                            inv.riskLevel === "medium" ? "bg-warning/10 text-warning" :
+                            "bg-destructive/10 text-destructive"
+                          }`}>
+                            {inv.riskLevel.toUpperCase()} RISK
+                          </span>
+                          <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent">
+                            {inv.timeHorizon}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{inv.reasoning}</p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Suggested investments:</p>
+                        <ul className="space-y-1">
+                          {inv.suggestions.map((suggestion, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-sm">
+                              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                              <span>{suggestion}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </FinancialCard>
+            )}
           </div>
         )}
       </div>
