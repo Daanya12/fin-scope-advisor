@@ -16,11 +16,23 @@ const TrendChart = ({ data }: TrendChartProps) => {
           dataKey="month" 
           className="text-xs" 
           tick={{ fill: 'hsl(var(--muted-foreground))' }}
+          label={{ 
+            value: 'Time', 
+            position: 'insideBottom', 
+            offset: -5,
+            style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 500 }
+          }}
         />
         <YAxis 
           domain={[0, 100]} 
           className="text-xs"
           tick={{ fill: 'hsl(var(--muted-foreground))' }}
+          label={{ 
+            value: 'Financial Score', 
+            angle: -90, 
+            position: 'insideLeft',
+            style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 500 }
+          }}
         />
         <Tooltip 
           contentStyle={{ 
