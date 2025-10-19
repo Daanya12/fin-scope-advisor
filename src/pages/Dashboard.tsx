@@ -25,12 +25,12 @@ const Dashboard = () => {
               </div>
               <div className="flex gap-4 justify-center flex-wrap">
                 <Link to="/analyze">
-                  <Button className="gradient-primary text-primary-foreground">
+                  <Button className="gradient-accent text-yellow-foreground font-semibold">
                     Analyze Finances
                   </Button>
                 </Link>
                 <Link to="/compare">
-                  <Button variant="outline">Compare Investments</Button>
+                  <Button variant="outline" className="border-yellow/50 hover:bg-yellow/10">Compare Investments</Button>
                 </Link>
               </div>
             </div>

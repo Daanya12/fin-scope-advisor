@@ -120,7 +120,7 @@ const AnalyzeFinances = () => {
 
             <Button
               type="submit"
-              className="w-full gradient-primary text-primary-foreground"
+              className="w-full gradient-accent text-yellow-foreground font-semibold"
               disabled={loading}
             >
               {loading ? (
@@ -130,7 +130,7 @@ const AnalyzeFinances = () => {
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 w-4 h-4 text-yellow" />
+                  <Sparkles className="mr-2 w-4 h-4" />
                   Analyze My Finances
                 </>
               )}

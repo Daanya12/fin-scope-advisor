@@ -36,8 +36,8 @@ All colors MUST be HSL.
     --accent: 262 52% 47%;
     --accent-foreground: 210 40% 98%;
 
-    /* Yellow accent - Subtle gold for highlights */
-    --yellow: 45 93% 58%;
+    /* Yellow accent - Prominent gold for highlights */
+    --yellow: 48 96% 53%;
     --yellow-foreground: 222 47% 11%;
 
     /* Success - Bright green for positive metrics */
@@ -60,10 +60,10 @@ All colors MUST be HSL.
     --radius: 0.75rem;
 
     /* Custom gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(222 47% 20%) 0%, hsl(262 52% 47%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(262 52% 47%) 0%, hsl(45 93% 58%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 46%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(220 15% 98%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(262 52% 47%) 0%, hsl(48 96% 53%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(48 96% 53%) 0%, hsl(262 52% 47%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(48 96% 53%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(48 96% 97%) 100%);
   }
 
   .dark {
@@ -104,10 +104,10 @@ All colors MUST be HSL.
     --input: 217 32% 18%;
     --ring: 262 52% 55%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(262 52% 30%) 0%, hsl(222 47% 20%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(262 52% 47%) 0%, hsl(45 93% 65%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 30%) 0%, hsl(142 76% 40%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(222 47% 11%) 0%, hsl(222 47% 14%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(262 52% 47%) 0%, hsl(48 96% 60%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(48 96% 60%) 0%, hsl(262 52% 47%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 30%) 0%, hsl(48 96% 60%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(222 47% 11%) 0%, hsl(48 30% 15%) 100%);
   }
 }
 
@@ -128,19 +128,19 @@ All colors MUST be HSL.
 
 @layer utilities {
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
-  }
-
-  .gradient-accent {
     background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--yellow)) 100%);
   }
 
+  .gradient-accent {
+    background: linear-gradient(135deg, hsl(var(--yellow)) 0%, hsl(var(--accent)) 100%);
+  }
+
   .gradient-success {
-    background: linear-gradient(135deg, hsl(var(--success)) 0%, hsl(142 76% 46%) 100%);
+    background: linear-gradient(135deg, hsl(var(--success)) 0%, hsl(var(--yellow)) 100%);
   }
 
   .gradient-card {
-    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(220 15% 98%) 100%);
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(48 96% 97%) 100%);
   }
 
   .glass-effect {

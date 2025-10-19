@@ -119,7 +119,7 @@ const CompareInvestments = () => {
 
             <Button
               type="submit"
-              className="w-full gradient-primary text-primary-foreground"
+              className="w-full gradient-accent text-yellow-foreground font-semibold"
               disabled={loading}
             >
               {loading ? (
@@ -148,7 +148,7 @@ const CompareInvestments = () => {
                   >
                     <div className="flex items-center justify-between">
                       <h3 className="text-xl font-bold">{investment.name}</h3>
-                      <div className="px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium">
+                      <div className="px-3 py-1 rounded-full bg-yellow/20 text-yellow-foreground border border-yellow/30 text-sm font-medium">
                         {investment.suitability}% Match
                       </div>
                     </div>

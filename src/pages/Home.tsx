@@ -18,7 +18,7 @@ const Home = () => {
             
             <h1 className="text-5xl md:text-6xl font-bold leading-tight">
               Your Complete{" "}
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-yellow via-accent to-yellow bg-clip-text text-transparent">
                 Financial Health
               </span>{" "}
               in One Place
@@ -31,13 +31,13 @@ const Home = () => {
 
             <div className="flex gap-4 justify-center flex-wrap">
               <Link to="/analyze">
-                <Button size="lg" className="gradient-primary text-primary-foreground">
+                <Button size="lg" className="gradient-accent text-yellow-foreground font-semibold shadow-lg hover:shadow-xl transition-shadow">
                   Analyze My Finances
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
               <Link to="/compare">
-                <Button size="lg" variant="outline">
+                <Button size="lg" variant="outline" className="border-yellow/50 hover:bg-yellow/10">
                   Compare Investments
                 </Button>
               </Link>
@@ -63,7 +63,7 @@ const Home = () => {
               gradient
             >
               <div className="space-y-4">
-                <Shield className="w-12 h-12 text-accent" />
+                <Shield className="w-12 h-12 text-yellow" />
                 <p className="text-sm text-muted-foreground">
                   Get insights into your debt-to-income ratio, credit utilization, and payment patterns.
                   See exactly how to improve your score.
@@ -113,7 +113,7 @@ const Home = () => {
               Start with a free financial health check. No credit card required.
             </p>
             <Link to="/analyze">
-              <Button size="lg" className="gradient-primary text-primary-foreground">
+              <Button size="lg" className="gradient-accent text-yellow-foreground font-semibold shadow-lg hover:shadow-xl transition-shadow">
                 Get Started Now
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
