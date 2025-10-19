@@ -138,26 +138,36 @@ Format your response as JSON with this structure:
       recommendations: analysis.recommendations,
     };
 
-    // Generate investment recommendations if user has disposable income
-    if (disposableIncome > 0) {
-      const investmentPrompt = `Based on this financial profile, provide personalized investment recommendations:
+    // ALWAYS generate investment recommendations (even with no disposable income, suggest savings strategies)
+    const investmentPrompt = `Based on this financial profile, provide personalized investment and savings recommendations:
 
 Financial Situation:
+- Monthly Income: £${monthlyIncome}
+- Monthly Expenses: £${monthlyExpenses}
 - Monthly Disposable Income: £${disposableIncome}
 - Financial Health Score: ${analysis.healthScore}/100
 - Credit Score: ${userCreditScore || analysis.estimatedCreditScore}
-- Debt Level: £${totalDebt}
+- Total Debt: £${totalDebt}
 - Debt-to-Income Ratio: ${debtToIncomeRatio}%
 
-Provide 2-3 investment recommendation categories covering different risk levels and time horizons. For each category:
-1. Category name (e.g., "Conservative Growth Portfolio", "Aggressive Tech & Innovation")
-2. Risk level (low/medium/high)
-3. Time horizon (e.g., "1-3 years", "5-10 years", "10+ years")
-4. Reasoning why this suits their profile
-5. 3-5 specific investment suggestions (stocks, ETFs, commodities, bonds)
+${disposableIncome > 0 
+  ? `The user has £${disposableIncome} available monthly for investing. Provide 3 investment recommendation categories covering different risk levels and time horizons.`
+  : `The user has NO disposable income. Focus on: 1) Emergency savings strategies, 2) Debt reduction plans, 3) Future investment preparation when finances improve.`
+}
 
-Consider their current financial health - if they have high debt, suggest more conservative options first.
-If they have strong financial health, include more aggressive growth options.
+For each category provide:
+1. Category name (e.g., "Emergency Fund Building", "Conservative Growth", "High-Growth Tech Portfolio")
+2. Risk level (low/medium/high)
+3. Time horizon (e.g., "0-1 years", "3-5 years", "5-10 years", "10+ years")
+4. Clear reasoning why this suits their profile
+5. 3-5 SPECIFIC investment suggestions with actual names (stocks like "Apple (AAPL)", ETFs like "Vanguard S&P 500 (VOO)", savings accounts, bonds)
+
+IMPORTANT RULES:
+- If debt is high (>£5000) or DTI >36%, prioritize low-risk options and debt reduction
+- If health score <60, focus on building emergency fund first
+- If disposable income is low (<£100), suggest micro-investing and savings strategies
+- Always include specific, actionable investment names, not generic categories
+- Make recommendations realistic for their budget
 
 Format as JSON:
 {
@@ -172,40 +182,43 @@ Format as JSON:
   ]
 }`;
 
-      const investmentResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a financial investment advisor. Provide specific, actionable investment recommendations. Always respond with valid JSON only.'
-            },
-            {
-              role: 'user',
-              content: investmentPrompt
-            }
-          ],
-          temperature: 0.7,
-        }),
-      });
+    // Generate investment recommendations
+    const investmentResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert financial investment advisor. Provide specific, actionable investment recommendations with REAL investment names (stocks, ETFs, bonds, etc.). Always respond with valid JSON only, no markdown.'
+          },
+          {
+            role: 'user',
+            content: investmentPrompt
+          }
+        ],
+        temperature: 0.7,
+      }),
+    });
 
-      if (investmentResponse.ok) {
-        const investmentData = await investmentResponse.json();
-        const investmentContent = investmentData.choices[0].message.content;
-        
-        try {
-          const cleanInvestmentContent = investmentContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-          const investmentAnalysis = JSON.parse(cleanInvestmentContent);
-          result.investmentRecommendations = investmentAnalysis.recommendations;
-        } catch (parseError) {
-          console.error('Error parsing investment recommendations:', investmentContent);
-          // Don't fail the entire request if investment recommendations fail
-        }
+    if (!investmentResponse.ok) {
+      console.error('Investment API error:', await investmentResponse.text());
+    } else {
+      const investmentData = await investmentResponse.json();
+      const investmentContent = investmentData.choices[0].message.content;
+      
+      try {
+        const cleanInvestmentContent = investmentContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const investmentAnalysis = JSON.parse(cleanInvestmentContent);
+        result.investmentRecommendations = investmentAnalysis.recommendations;
+        console.log('Investment recommendations generated:', result.investmentRecommendations?.length || 0);
+      } catch (parseError) {
+        console.error('Error parsing investment recommendations:', investmentContent);
+        console.error('Parse error:', parseError);
       }
     }
 
