@@ -8,97 +8,106 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Main background - clean white */
-    --background: 0 0% 100%;
-    --foreground: 140 20% 15%;
+    /* Main background - light */
+    --background: 0 0% 98%;
+    --foreground: 238 24% 20%;
 
-    /* Card surfaces with subtle sage tint */
-    --card: 130 15% 98%;
-    --card-foreground: 140 20% 15%;
+    /* Card surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 238 24% 20%;
 
     /* Popover surfaces */
     --popover: 0 0% 100%;
-    --popover-foreground: 140 20% 15%;
+    --popover-foreground: 238 24% 20%;
 
-    /* Primary - Sage green */
-    --primary: 130 30% 45%;
+    /* Primary - Coral pink #F64668 */
+    --primary: 348 91% 62%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Light sage */
-    --secondary: 130 20% 90%;
-    --secondary-foreground: 140 20% 20%;
+    /* Secondary - Dark purple #41436A */
+    --secondary: 238 24% 34%;
+    --secondary-foreground: 0 0% 100%;
 
-    /* Muted - Light sage backgrounds */
-    --muted: 130 15% 95%;
-    --muted-foreground: 140 15% 40%;
+    /* Muted - Light tints */
+    --muted: 238 20% 95%;
+    --muted-foreground: 238 24% 45%;
 
-    /* Accent - Rich purple */
-    --accent: 270 60% 55%;
+    /* Accent - Burgundy #984063 */
+    --accent: 336 41% 42%;
     --accent-foreground: 0 0% 100%;
 
-    /* Success - Bright sage for positive metrics */
-    --success: 125 40% 50%;
-    --success-foreground: 0 0% 100%;
+    /* Success - Peach #FE9677 */
+    --success: 14 98% 73%;
+    --success-foreground: 238 24% 20%;
 
-    /* Warning - Amber for alerts */
-    --warning: 45 95% 50%;
-    --warning-foreground: 140 20% 15%;
+    /* Warning - Bright coral */
+    --warning: 348 91% 62%;
+    --warning-foreground: 0 0% 100%;
 
-    /* Destructive - Red for danger */
+    /* Destructive - Deep red */
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders and inputs */
-    --border: 130 20% 85%;
-    --input: 130 15% 90%;
-    --ring: 270 60% 55%;
+    --border: 238 20% 85%;
+    --input: 238 15% 90%;
+    --ring: 348 91% 62%;
 
     --radius: 0.75rem;
 
     /* Custom gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(130 30% 45%) 0%, hsl(270 60% 55%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(270 60% 55%) 0%, hsl(125 40% 50%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(130 15% 98%) 0%, hsl(130 20% 96%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(348 91% 62%) 0%, hsl(336 41% 42%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(336 41% 42%) 0%, hsl(14 98% 73%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(238 20% 98%) 100%);
   }
 
   .dark {
-    --background: 140 15% 12%;
-    --foreground: 120 20% 98%;
+    /* Dark theme - using the palette background */
+    --background: 220 16% 22%;
+    --foreground: 0 0% 95%;
 
-    --card: 135 18% 16%;
-    --card-foreground: 120 20% 98%;
+    --card: 220 16% 26%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 135 18% 16%;
-    --popover-foreground: 120 20% 98%;
+    --popover: 220 16% 26%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 130 30% 60%;
-    --primary-foreground: 140 15% 10%;
+    /* Primary - Coral pink */
+    --primary: 348 91% 62%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 135 20% 35%;
-    --secondary-foreground: 120 20% 98%;
+    /* Secondary - Dark purple */
+    --secondary: 238 24% 34%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 140 18% 20%;
-    --muted-foreground: 130 15% 65%;
+    /* Muted */
+    --muted: 220 16% 30%;
+    --muted-foreground: 238 20% 70%;
 
-    --accent: 270 60% 65%;
+    /* Accent - Burgundy */
+    --accent: 336 41% 52%;
     --accent-foreground: 0 0% 100%;
 
-    --success: 125 40% 65%;
-    --success-foreground: 140 15% 10%;
+    /* Success - Peach */
+    --success: 14 98% 73%;
+    --success-foreground: 220 16% 22%;
 
-    --warning: 45 95% 60%;
-    --warning-foreground: 140 15% 10%;
+    /* Warning - Bright coral */
+    --warning: 348 91% 62%;
+    --warning-foreground: 0 0% 100%;
 
+    /* Destructive */
     --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 135 20% 25%;
-    --input: 135 20% 22%;
-    --ring: 270 60% 65%;
+    /* Borders and inputs */
+    --border: 220 16% 35%;
+    --input: 220 16% 30%;
+    --ring: 348 91% 62%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(130 30% 60%) 0%, hsl(270 60% 65%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(125 40% 65%) 0%, hsl(130 30% 60%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(135 18% 16%) 0%, hsl(140 18% 18%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(348 91% 62%) 0%, hsl(336 41% 52%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(336 41% 52%) 0%, hsl(14 98% 73%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(220 16% 26%) 0%, hsl(220 16% 28%) 100%);
   }
 }
 
