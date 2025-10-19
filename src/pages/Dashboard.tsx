@@ -25,9 +25,16 @@ interface FinancialAnalysis {
   };
 }
 
+interface InvestmentSuggestion {
+  name: string;
+  ticker: string;
+  price?: number;
+  changePercent?: number;
+}
+
 interface InvestmentRecommendation {
   category: string;
-  suggestions: string[];
+  suggestions: InvestmentSuggestion[];
   riskLevel: "low" | "medium" | "high";
   timeHorizon: string;
   reasoning: string;
@@ -238,11 +245,26 @@ const Dashboard = () => {
                   <p className="text-sm text-muted-foreground">{inv.reasoning}</p>
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Suggested investments:</p>
-                    <ul className="space-y-1">
+                    <ul className="space-y-2">
                       {inv.suggestions.map((suggestion, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                          <span>{suggestion}</span>
+                        <li key={idx} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                          <div className="flex items-start gap-2 flex-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium">{suggestion.name}</span>
+                              <span className="text-muted-foreground ml-2">({suggestion.ticker})</span>
+                            </div>
+                          </div>
+                          {suggestion.price && (
+                            <div className="text-right">
+                              <div className="font-semibold">${suggestion.price.toFixed(2)}</div>
+                              {suggestion.changePercent !== undefined && (
+                                <div className={`text-xs ${suggestion.changePercent >= 0 ? 'text-success' : 'text-destructive'}`}>
+                                  {suggestion.changePercent >= 0 ? '▲' : '▼'} {Math.abs(suggestion.changePercent).toFixed(2)}%
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </li>
                       ))}
                     </ul>
