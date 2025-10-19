@@ -87,20 +87,9 @@ export const SupportChat = () => {
       {/* Chat window */}
       {isOpen && (
         <Card className="fixed bottom-24 right-6 w-96 h-[500px] flex flex-col shadow-xl z-50">
-          <div className="p-4 border-b flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold">AI Support Assistant</h3>
-              <p className="text-xs text-muted-foreground">Ask me anything about the platform</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClearHistory}
-              title="Clear chat history"
-              className="hover:bg-destructive/10"
-            >
-              <Trash2 className="w-5 h-5 text-muted-foreground hover:text-destructive" />
-            </Button>
+          <div className="p-4 border-b">
+            <h3 className="font-semibold">AI Support Assistant</h3>
+            <p className="text-xs text-muted-foreground">Ask me anything about the platform</p>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -132,6 +121,15 @@ export const SupportChat = () => {
 
           <div className="p-4 border-t">
             <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClearHistory}
+                title="Clear chat history"
+                className="hover:bg-destructive/10"
+              >
+                <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+              </Button>
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
