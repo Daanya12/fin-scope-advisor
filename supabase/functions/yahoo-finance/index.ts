@@ -94,57 +94,68 @@ serve(async (req) => {
           : ['QQQ', 'VUG', 'ARKK', 'TSLA', 'NVDA', 'MSFT', 'GOOGL']; // High risk long-term: aggressive tech
       }
 
-      // Fetch quotes for recommended symbols using the quote endpoint for more complete data
-      const symbolsString = symbolPool.slice(0, 8).join(',');
-      
-      try {
-        const response = await fetch(
-          `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolsString}`
-        );
-        const data = await response.json();
-        
-        console.log('Yahoo Finance Response:', JSON.stringify(data, null, 2));
-        
-        if (!data.quoteResponse?.result) {
-          console.error('Invalid response structure from Yahoo Finance');
-          return new Response(
-            JSON.stringify({ recommendations: [] }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
+      // Fetch quotes for recommended symbols with 5-day range to get previous close
+      const recommendations = await Promise.all(
+        symbolPool.slice(0, 8).map(async (symbol) => {
+          try {
+            const response = await fetch(
+              `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`
+            );
+            const data = await response.json();
+            
+            if (!data.chart?.result?.[0]) {
+              console.error(`No data for ${symbol}`);
+              return null;
+            }
 
-        const recommendations = data.quoteResponse.result.map((quote: any) => {
-          const currentPrice = quote.regularMarketPrice || 0;
-          const previousClose = quote.regularMarketPreviousClose || currentPrice;
-          
-          // Calculate change and percentage if not provided
-          const change = quote.regularMarketChange || (currentPrice - previousClose);
-          const changePercent = quote.regularMarketChangePercent || 
-            (previousClose !== 0 ? ((currentPrice - previousClose) / previousClose) * 100 : 0);
-          
-          console.log(`${quote.symbol}: price=${currentPrice}, change=${change}, changePercent=${changePercent}`);
-          
-          return {
-            symbol: quote.symbol,
-            name: quote.longName || quote.shortName || quote.symbol,
-            price: currentPrice,
-            change: change,
-            changePercent: changePercent,
-            type: quote.quoteType?.toLowerCase() || 'stock',
-          };
-        });
+            const result = data.chart.result[0];
+            const meta = result.meta;
+            const timestamps = result.timestamp || [];
+            const closes = result.indicators?.quote?.[0]?.close || [];
+            
+            // Get current price
+            const currentPrice = meta.regularMarketPrice || closes[closes.length - 1] || 0;
+            
+            // Get previous day's close (second to last close value)
+            let previousClose = currentPrice;
+            if (closes.length >= 2) {
+              // Find the last valid close before the current one
+              for (let i = closes.length - 2; i >= 0; i--) {
+                if (closes[i] != null && closes[i] > 0) {
+                  previousClose = closes[i];
+                  break;
+                }
+              }
+            }
+            
+            // Calculate change and percentage
+            const change = currentPrice - previousClose;
+            const changePercent = previousClose !== 0 ? (change / previousClose) * 100 : 0;
+            
+            console.log(`${symbol}: current=${currentPrice}, previous=${previousClose}, change=${change}, changePercent=${changePercent}`);
+            
+            return {
+              symbol: meta.symbol,
+              name: meta.longName || meta.symbol,
+              price: currentPrice,
+              change: change,
+              changePercent: changePercent,
+              type: symbol.length <= 5 && !symbol.includes('.') ? 'stock' : 'etf',
+            };
+          } catch (error) {
+            console.error(`Error fetching ${symbol}:`, error);
+            return null;
+          }
+        })
+      );
 
-        return new Response(
-          JSON.stringify({ recommendations }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      } catch (error) {
-        console.error('Error fetching recommendations:', error);
-        return new Response(
-          JSON.stringify({ recommendations: [] }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+      const validRecommendations = recommendations.filter(r => r !== null);
+      console.log(`Returning ${validRecommendations.length} recommendations`);
+
+      return new Response(
+        JSON.stringify({ recommendations: validRecommendations }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     throw new Error('Invalid action');
