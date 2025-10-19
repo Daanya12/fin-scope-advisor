@@ -1,4 +1,4 @@
-import { BarChart3, TrendingUp, Shield, Calendar } from "lucide-react";
+import { BarChart3, TrendingUp, Shield, Calendar, TrendingDown } from "lucide-react";
 import FinancialCard from "@/components/FinancialCard";
 import HealthMeter from "@/components/HealthMeter";
 import { Link, useNavigate } from "react-router-dom";
@@ -10,6 +10,10 @@ import { Loader2 } from "lucide-react";
 import MonthSelector from "@/components/MonthSelector";
 import TrendChart from "@/components/TrendChart";
 import ComparisonMetric from "@/components/ComparisonMetric";
+import IncomeExpensesChart from "@/components/IncomeExpensesChart";
+import DebtChart from "@/components/DebtChart";
+import CreditScoreChart from "@/components/CreditScoreChart";
+import RatiosChart from "@/components/RatiosChart";
 
 interface FinancialAnalysis {
   id: string;
@@ -121,13 +125,35 @@ const Dashboard = () => {
   }, [selectedMonth, historicalData]);
 
   // Prepare chart data
-  const chartData = historicalData
-    .slice(0, 6)
-    .reverse()
-    .map(a => ({
-      month: `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][a.month - 1]} ${a.year.toString().slice(2)}`,
-      score: a.financial_score
-    }));
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const recentData = historicalData.slice(0, 6).reverse();
+  
+  const healthScoreData = recentData.map(a => ({
+    month: `${monthNames[a.month - 1]} ${a.year.toString().slice(2)}`,
+    score: a.financial_score
+  }));
+
+  const incomeExpensesData = recentData.map(a => ({
+    month: `${monthNames[a.month - 1]} ${a.year.toString().slice(2)}`,
+    income: a.monthly_income,
+    expenses: a.monthly_expenses
+  }));
+
+  const debtData = recentData.map(a => ({
+    month: `${monthNames[a.month - 1]} ${a.year.toString().slice(2)}`,
+    debt: a.debt_amount
+  }));
+
+  const creditScoreData = recentData.map(a => ({
+    month: `${monthNames[a.month - 1]} ${a.year.toString().slice(2)}`,
+    score: a.credit_score
+  }));
+
+  const ratiosData = recentData.map(a => ({
+    month: `${monthNames[a.month - 1]} ${a.year.toString().slice(2)}`,
+    dti: a.debt_to_income_ratio,
+    utilization: a.credit_utilization
+  }));
 
   // Get previous month's data for comparison
   const currentIndex = historicalData.findIndex(
@@ -231,9 +257,56 @@ const Dashboard = () => {
         </div>
 
         {historicalData.length > 1 && (
-          <FinancialCard title="Financial Health Trend" gradient>
-            <TrendChart data={chartData} />
-          </FinancialCard>
+          <>
+            <FinancialCard title="Financial Health Score Over Time" gradient>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Track your overall financial health progress
+                </p>
+                <TrendChart data={healthScoreData} />
+              </div>
+            </FinancialCard>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <FinancialCard title="Income vs Expenses" gradient>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Monitor your cash flow trends
+                  </p>
+                  <IncomeExpensesChart data={incomeExpensesData} />
+                </div>
+              </FinancialCard>
+
+              <FinancialCard title="Debt Reduction Progress" gradient>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Track how your debt is changing
+                  </p>
+                  <DebtChart data={debtData} />
+                </div>
+              </FinancialCard>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <FinancialCard title="Credit Score Trend" gradient>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Watch your creditworthiness improve
+                  </p>
+                  <CreditScoreChart data={creditScoreData} />
+                </div>
+              </FinancialCard>
+
+              <FinancialCard title="Financial Ratios" gradient>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Key metrics for financial health
+                  </p>
+                  <RatiosChart data={ratiosData} />
+                </div>
+              </FinancialCard>
+            </div>
+          </>
         )}
 
         <div className="grid md:grid-cols-2 gap-6">
