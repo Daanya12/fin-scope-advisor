@@ -1,4 +1,4 @@
-import { BarChart3, TrendingUp, Shield, Calendar, TrendingDown } from "lucide-react";
+import { BarChart3, TrendingUp, Shield, Calendar, TrendingDown, History } from "lucide-react";
 import FinancialCard from "@/components/FinancialCard";
 import HealthMeter from "@/components/HealthMeter";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,6 +14,7 @@ import IncomeExpensesChart from "@/components/IncomeExpensesChart";
 import DebtChart from "@/components/DebtChart";
 import CreditScoreChart from "@/components/CreditScoreChart";
 import RatiosChart from "@/components/RatiosChart";
+import FinancialHistory from "@/components/FinancialHistory";
 
 interface FinancialAnalysis {
   id: string;
@@ -414,11 +415,13 @@ const Dashboard = () => {
                           <div className="flex items-start gap-2 flex-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                             <div>
-                              <span className="font-medium">{suggestion.name}</span>
-                              <span className="text-muted-foreground ml-2">({suggestion.ticker})</span>
+                              <span className="font-medium">{typeof suggestion === 'string' ? suggestion : suggestion.name}</span>
+                              {typeof suggestion === 'object' && suggestion.ticker && (
+                                <span className="text-muted-foreground ml-2">({suggestion.ticker})</span>
+                              )}
                             </div>
                           </div>
-                          {suggestion.price && (
+                          {typeof suggestion === 'object' && suggestion.price && (
                             <div className="text-right">
                               <div className="font-semibold">${suggestion.price.toFixed(2)}</div>
                               {suggestion.changePercent !== undefined && (
@@ -434,6 +437,23 @@ const Dashboard = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </FinancialCard>
+        )}
+
+        {historicalData.length > 1 && (
+          <FinancialCard title="Financial History" gradient>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <History className="w-5 h-5" />
+                <p className="text-sm">
+                  Complete history of your financial data. Click any row to view that month.
+                </p>
+              </div>
+              <FinancialHistory 
+                data={historicalData}
+                onSelectMonth={(month, year) => setSelectedMonth({ month, year })}
+              />
             </div>
           </FinancialCard>
         )}
