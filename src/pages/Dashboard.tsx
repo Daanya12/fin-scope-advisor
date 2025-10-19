@@ -231,31 +231,67 @@ const Dashboard = () => {
           </FinancialCard>
         )}
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <FinancialCard title="Overall Health" gradient>
-            <HealthMeter score={analysis.financial_score} label="Financial Score" size="lg" />
-          </FinancialCard>
-
-          <FinancialCard title="Credit Status" gradient>
-            <div className="space-y-4">
-              <Shield className="w-8 h-8 text-warning" />
+        <FinancialCard title="Financial Health Summary" gradient>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <div>
+                <h3 className="text-lg font-medium text-muted-foreground">Overall Status</h3>
+                <p className="text-3xl font-bold mt-1">
+                  {analysis.financial_score >= 80 ? "Excellent" : 
+                   analysis.financial_score >= 60 ? "Good" : "Needs Attention"}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-muted-foreground">Health Score</div>
+                <div className={`text-4xl font-bold ${
+                  analysis.financial_score >= 80 ? "text-success" :
+                  analysis.financial_score >= 60 ? "text-warning" : "text-destructive"
+                }`}>
+                  {analysis.financial_score}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                <div className="text-xs text-muted-foreground mb-1">Monthly Income</div>
+                <div className="text-xl font-bold">£{analysis.monthly_income.toFixed(0)}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                <div className="text-xs text-muted-foreground mb-1">Monthly Expenses</div>
+                <div className="text-xl font-bold">£{analysis.monthly_expenses.toFixed(0)}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                <div className="text-xs text-muted-foreground mb-1">Available to Save</div>
+                <div className="text-xl font-bold text-success">
+                  £{analysis.monthly_available.toFixed(0)}
+                </div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                <div className="text-xs text-muted-foreground mb-1">Total Debt</div>
+                <div className="text-xl font-bold">£{analysis.debt_amount.toFixed(0)}</div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="flex items-center gap-3 mb-3">
+                  <Shield className="w-6 h-6 text-warning" />
+                  <div className="text-sm text-muted-foreground">Credit Score</div>
+                </div>
                 <div className="text-2xl font-bold">{analysis.credit_score}</div>
-                <div className="text-sm text-muted-foreground">Credit Score</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="text-sm text-muted-foreground mb-2">Debt-to-Income</div>
+                <div className="text-2xl font-bold">{analysis.debt_to_income_ratio.toFixed(1)}%</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="text-sm text-muted-foreground mb-2">Credit Utilization</div>
+                <div className="text-2xl font-bold">{analysis.credit_utilization.toFixed(1)}%</div>
               </div>
             </div>
-          </FinancialCard>
-
-          <FinancialCard title="Investment Ready" gradient>
-            <div className="space-y-4">
-              <TrendingUp className="w-8 h-8 text-success" />
-              <div>
-                <div className="text-2xl font-bold">£{analysis.monthly_available.toFixed(0)}</div>
-                <div className="text-sm text-muted-foreground">Monthly Available</div>
-              </div>
-            </div>
-          </FinancialCard>
-        </div>
+          </div>
+        </FinancialCard>
 
         {historicalData.length > 1 && (
           <>

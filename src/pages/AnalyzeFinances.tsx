@@ -348,21 +348,71 @@ const AnalyzeFinances = () => {
 
         {result && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-            <FinancialCard title="Your Financial Health Score" gradient>
+            <FinancialCard title="Financial Health Summary" gradient>
               <div className="space-y-6">
-                <HealthMeter score={result.healthScore} label="Overall Health" size="lg" />
-                <HealthMeter score={result.creditScore} label="Credit Score" size="md" />
-                
-                <div className="grid md:grid-cols-2 gap-4 pt-4">
-                  <div className="p-4 rounded-lg bg-muted">
-                    <div className="text-sm text-muted-foreground mb-1">Debt-to-Income Ratio</div>
-                    <div className="text-2xl font-bold">{result.debtToIncomeRatio}%</div>
+                <div className="flex items-center justify-between pb-4 border-b border-border">
+                  <div>
+                    <h3 className="text-lg font-medium text-muted-foreground">Overall Status</h3>
+                    <p className="text-3xl font-bold mt-1">
+                      {result.healthScore >= 80 ? "Excellent" : 
+                       result.healthScore >= 60 ? "Good" : "Needs Attention"}
+                    </p>
                   </div>
-                  <div className="p-4 rounded-lg bg-muted">
-                    <div className="text-sm text-muted-foreground mb-1">Credit Utilization</div>
-                    <div className="text-2xl font-bold">{result.creditUtilization}%</div>
+                  <div className="text-right">
+                    <div className="text-sm text-muted-foreground">Health Score</div>
+                    <div className={`text-4xl font-bold ${
+                      result.healthScore >= 80 ? "text-success" :
+                      result.healthScore >= 60 ? "text-warning" : "text-destructive"
+                    }`}>
+                      {result.healthScore}
+                    </div>
                   </div>
                 </div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                    <div className="text-xs text-muted-foreground mb-1">Monthly Income</div>
+                    <div className="text-xl font-bold">£{parseFloat(formData.income).toFixed(0)}</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                    <div className="text-xs text-muted-foreground mb-1">Monthly Expenses</div>
+                    <div className="text-xl font-bold">£{parseFloat(formData.expenses).toFixed(0)}</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                    <div className="text-xs text-muted-foreground mb-1">Available to Save</div>
+                    <div className="text-xl font-bold text-success">
+                      £{(parseFloat(formData.income) - parseFloat(formData.expenses)).toFixed(0)}
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                    <div className="text-xs text-muted-foreground mb-1">Total Debt</div>
+                    <div className="text-xl font-bold">£{parseFloat(formData.debt).toFixed(0)}</div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg bg-muted">
+                    <HealthMeter score={result.creditScore} label="Credit Score" size="md" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-lg bg-muted/50">
+                      <div className="text-sm text-muted-foreground mb-1">Debt-to-Income Ratio</div>
+                      <div className="text-2xl font-bold">{result.debtToIncomeRatio}%</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/50">
+                      <div className="text-sm text-muted-foreground mb-1">Credit Utilization</div>
+                      <div className="text-2xl font-bold">{result.creditUtilization}%</div>
+                    </div>
+                  </div>
+                </div>
+
+                {user && (
+                  <div className="pt-4 border-t border-border">
+                    <p className="text-sm text-center text-muted-foreground">
+                      ✓ This analysis has been saved to your dashboard
+                    </p>
+                  </div>
+                )}
               </div>
             </FinancialCard>
 
