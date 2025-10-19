@@ -94,41 +94,57 @@ serve(async (req) => {
           : ['QQQ', 'VUG', 'ARKK', 'TSLA', 'NVDA', 'MSFT', 'GOOGL']; // High risk long-term: aggressive tech
       }
 
-      // Fetch quotes for recommended symbols
-      const recommendations = await Promise.all(
-        symbolPool.slice(0, 8).map(async (symbol) => {
-          try {
-            const response = await fetch(
-              `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`
-            );
-            const data = await response.json();
-            
-            if (!data.chart?.result?.[0]) {
-              return null;
-            }
+      // Fetch quotes for recommended symbols using the quote endpoint for more complete data
+      const symbolsString = symbolPool.slice(0, 8).join(',');
+      
+      try {
+        const response = await fetch(
+          `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolsString}`
+        );
+        const data = await response.json();
+        
+        console.log('Yahoo Finance Response:', JSON.stringify(data, null, 2));
+        
+        if (!data.quoteResponse?.result) {
+          console.error('Invalid response structure from Yahoo Finance');
+          return new Response(
+            JSON.stringify({ recommendations: [] }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
 
-            const result = data.chart.result[0];
-            const meta = result.meta;
-            
-            return {
-              symbol: meta.symbol,
-              name: meta.longName || meta.symbol,
-              price: meta.regularMarketPrice || 0,
-              change: meta.regularMarketChange || 0,
-              changePercent: meta.regularMarketChangePercent || 0,
-              type: symbol.length <= 5 && !symbol.includes('.') ? 'stock' : 'etf',
-            };
-          } catch (error) {
-            console.error(`Error fetching ${symbol}:`, error);
-            return null;
-          }
-        })
-      );
+        const recommendations = data.quoteResponse.result.map((quote: any) => {
+          const currentPrice = quote.regularMarketPrice || 0;
+          const previousClose = quote.regularMarketPreviousClose || currentPrice;
+          
+          // Calculate change and percentage if not provided
+          const change = quote.regularMarketChange || (currentPrice - previousClose);
+          const changePercent = quote.regularMarketChangePercent || 
+            (previousClose !== 0 ? ((currentPrice - previousClose) / previousClose) * 100 : 0);
+          
+          console.log(`${quote.symbol}: price=${currentPrice}, change=${change}, changePercent=${changePercent}`);
+          
+          return {
+            symbol: quote.symbol,
+            name: quote.longName || quote.shortName || quote.symbol,
+            price: currentPrice,
+            change: change,
+            changePercent: changePercent,
+            type: quote.quoteType?.toLowerCase() || 'stock',
+          };
+        });
 
-      return new Response(
-        JSON.stringify({ recommendations: recommendations.filter(r => r !== null) }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+        return new Response(
+          JSON.stringify({ recommendations }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+        return new Response(
+          JSON.stringify({ recommendations: [] }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     throw new Error('Invalid action');
