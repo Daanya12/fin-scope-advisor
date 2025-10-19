@@ -9,6 +9,7 @@ import HealthMeter from "@/components/HealthMeter";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
+import MonthSelector from "@/components/MonthSelector";
 import {
   Accordion,
   AccordionContent,
@@ -53,6 +54,12 @@ const AnalyzeFinances = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const currentDate = new Date();
+  const [selectedMonth, setSelectedMonth] = useState({
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear()
+  });
+
   const [formData, setFormData] = useState({
     income: "",
     expenses: "",
@@ -66,7 +73,12 @@ const AnalyzeFinances = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("analyze-finances", {
-        body: formData,
+        body: {
+          ...formData,
+          month: selectedMonth.month,
+          year: selectedMonth.year,
+          userId: user?.id,
+        },
       });
 
       if (error) throw error;
@@ -77,10 +89,13 @@ const AnalyzeFinances = () => {
       if (user) {
         const monthlyAvailable = parseFloat(formData.income) - parseFloat(formData.expenses);
         
+        // Upsert to handle updates to existing month
         const { error: saveError } = await supabase
           .from("financial_analyses")
-          .insert({
+          .upsert({
             user_id: user.id,
+            month: selectedMonth.month,
+            year: selectedMonth.year,
             monthly_income: parseFloat(formData.income),
             monthly_expenses: parseFloat(formData.expenses),
             credit_score: formData.creditScore ? parseInt(formData.creditScore) : data.creditScore,
@@ -94,6 +109,8 @@ const AnalyzeFinances = () => {
               actions: data.recommendations,
               investments: data.investmentRecommendations || []
             }
+          }, {
+            onConflict: 'user_id,month,year'
           });
 
         if (saveError) {
@@ -242,6 +259,16 @@ const AnalyzeFinances = () => {
 
         <FinancialCard title="Your Financial Information" gradient>
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label>Analysis Month</Label>
+              <MonthSelector 
+                value={selectedMonth}
+                onChange={(month, year) => setSelectedMonth({ month, year })}
+              />
+              <p className="text-sm text-muted-foreground">
+                Select the month you want to analyze
+              </p>
+            </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="income">Monthly Income (£)</Label>

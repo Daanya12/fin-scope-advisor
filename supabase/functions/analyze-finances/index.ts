@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { income, expenses, debt, creditScore } = await req.json();
+    const { income, expenses, debt, creditScore, month, year, userId } = await req.json();
     
     const monthlyIncome = parseFloat(income);
     const monthlyExpenses = parseFloat(expenses);
@@ -25,8 +25,40 @@ serve(async (req) => {
       Math.min(((totalDebt / 5000) * 100), 100).toFixed(1) : // Assuming £5000 credit limit
       ((totalDebt / (monthlyIncome * 2)) * 100).toFixed(1);
 
+    // Fetch historical data if userId is provided
+    let historicalContext = '';
+    if (userId) {
+      try {
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const { data: historicalData } = await supabase
+          .from('financial_analyses')
+          .select('month, year, financial_score, monthly_income, monthly_expenses, debt_amount, credit_score')
+          .eq('user_id', userId)
+          .order('year', { ascending: false })
+          .order('month', { ascending: false })
+          .limit(6);
+
+        if (historicalData && historicalData.length > 0) {
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          historicalContext = '\n\nHistorical Data (last 6 months):\n' + 
+            historicalData.map(h => 
+              `${monthNames[h.month - 1]} ${h.year}: Score ${h.financial_score}/100, Income £${h.monthly_income}, Expenses £${h.monthly_expenses}, Debt £${h.debt_amount}`
+            ).join('\n');
+        }
+      } catch (error) {
+        console.error('Error fetching historical data:', error);
+      }
+    }
+
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const analysisMonth = month ? `${monthNames[month - 1]} ${year}` : 'Current Month';
+
     // Prepare AI prompt
-    const prompt = `Analyze this financial situation and provide insights:
+    const prompt = `Analyze this financial situation for ${analysisMonth} and provide insights:${historicalContext}
 
 Monthly Income: £${monthlyIncome}
 Monthly Expenses: £${monthlyExpenses}
@@ -40,8 +72,8 @@ Credit Utilization: ${creditUtilization}%
 Provide:
 1. A financial health score (0-100)
 2. An estimated credit score if not provided (or validate the provided one)
-3. 3-4 key insights about their financial situation
-4. 3-4 specific, actionable recommendations to improve their financial health
+3. 3-4 key insights about their financial situation${historicalContext ? ', including trends compared to previous months' : ''}
+4. 3-4 specific, actionable recommendations to improve their financial health${historicalContext ? ', considering their progress or regression' : ''}
 
 Format your response as JSON with this structure:
 {

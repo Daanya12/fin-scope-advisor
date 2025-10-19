@@ -23,12 +23,14 @@ export type Database = {
           debt_to_income_ratio: number | null
           financial_score: number
           id: string
+          month: number
           monthly_available: number | null
           monthly_expenses: number
           monthly_income: number
           recommendations: Json | null
           updated_at: string | null
           user_id: string
+          year: number
         }
         Insert: {
           created_at?: string | null
@@ -38,12 +40,14 @@ export type Database = {
           debt_to_income_ratio?: number | null
           financial_score: number
           id?: string
+          month: number
           monthly_available?: number | null
           monthly_expenses: number
           monthly_income: number
           recommendations?: Json | null
           updated_at?: string | null
           user_id: string
+          year: number
         }
         Update: {
           created_at?: string | null
@@ -53,12 +57,14 @@ export type Database = {
           debt_to_income_ratio?: number | null
           financial_score?: number
           id?: string
+          month?: number
           monthly_available?: number | null
           monthly_expenses?: number
           monthly_income?: number
           recommendations?: Json | null
           updated_at?: string | null
           user_id?: string
+          year?: number
         }
         Relationships: [
           {

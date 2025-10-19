@@ -1,4 +1,4 @@
-import { BarChart3, TrendingUp, Shield, AlertCircle } from "lucide-react";
+import { BarChart3, TrendingUp, Shield, Calendar } from "lucide-react";
 import FinancialCard from "@/components/FinancialCard";
 import HealthMeter from "@/components/HealthMeter";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,9 +7,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
+import MonthSelector from "@/components/MonthSelector";
+import TrendChart from "@/components/TrendChart";
+import ComparisonMetric from "@/components/ComparisonMetric";
 
 interface FinancialAnalysis {
   id: string;
+  month: number;
+  year: number;
   monthly_income: number;
   monthly_expenses: number;
   credit_score: number;
@@ -43,8 +48,15 @@ interface InvestmentRecommendation {
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [analysis, setAnalysis] = useState<FinancialAnalysis | null>(null);
+  const [historicalData, setHistoricalData] = useState<FinancialAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  
+  const currentDate = new Date();
+  const [selectedMonth, setSelectedMonth] = useState({
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear()
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,17 +69,29 @@ const Dashboard = () => {
 
       setUser(session.user);
 
-      // Fetch latest analysis
-      const { data, error } = await supabase
+      // Fetch all analyses for historical data
+      const { data: allData, error: allError } = await supabase
         .from("financial_analyses")
         .select("*")
         .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .order("year", { ascending: false })
+        .order("month", { ascending: false });
 
-      if (!error && data) {
-        setAnalysis(data as unknown as FinancialAnalysis);
+      if (!allError && allData && allData.length > 0) {
+        const analyses = allData as unknown as FinancialAnalysis[];
+        setHistoricalData(analyses);
+        
+        // Find analysis for selected month or default to latest
+        const selectedAnalysis = analyses.find(
+          a => a.month === selectedMonth.month && a.year === selectedMonth.year
+        ) || analyses[0];
+        
+        setAnalysis(selectedAnalysis);
+        
+        // Update selected month to match the found analysis
+        if (selectedAnalysis) {
+          setSelectedMonth({ month: selectedAnalysis.month, year: selectedAnalysis.year });
+        }
       }
 
       setLoading(false);
@@ -83,6 +107,35 @@ const Dashboard = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Update analysis when month selection changes
+  useEffect(() => {
+    if (historicalData.length > 0) {
+      const selectedAnalysis = historicalData.find(
+        a => a.month === selectedMonth.month && a.year === selectedMonth.year
+      );
+      if (selectedAnalysis) {
+        setAnalysis(selectedAnalysis);
+      }
+    }
+  }, [selectedMonth, historicalData]);
+
+  // Prepare chart data
+  const chartData = historicalData
+    .slice(0, 6)
+    .reverse()
+    .map(a => ({
+      month: `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][a.month - 1]} ${a.year.toString().slice(2)}`,
+      score: a.financial_score
+    }));
+
+  // Get previous month's data for comparison
+  const currentIndex = historicalData.findIndex(
+    a => a.month === selectedMonth.month && a.year === selectedMonth.year
+  );
+  const previousAnalysis = currentIndex >= 0 && currentIndex < historicalData.length - 1 
+    ? historicalData[currentIndex + 1] 
+    : undefined;
 
   if (loading) {
     return (
@@ -136,6 +189,21 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {historicalData.length > 1 && (
+          <FinancialCard title="View Different Month" gradient>
+            <div className="flex items-center gap-4">
+              <Calendar className="w-5 h-5 text-muted-foreground" />
+              <MonthSelector 
+                value={selectedMonth}
+                onChange={(month, year) => setSelectedMonth({ month, year })}
+              />
+              <span className="text-sm text-muted-foreground">
+                {historicalData.length} months of data
+              </span>
+            </div>
+          </FinancialCard>
+        )}
+
         <div className="grid md:grid-cols-3 gap-6">
           <FinancialCard title="Overall Health" gradient>
             <HealthMeter score={analysis.financial_score} label="Financial Score" size="lg" />
@@ -162,34 +230,56 @@ const Dashboard = () => {
           </FinancialCard>
         </div>
 
+        {historicalData.length > 1 && (
+          <FinancialCard title="Financial Health Trend" gradient>
+            <TrendChart data={chartData} />
+          </FinancialCard>
+        )}
+
         <div className="grid md:grid-cols-2 gap-6">
           <FinancialCard title="Financial Metrics" gradient>
             <div className="space-y-4">
-              <div className="p-4 rounded-lg bg-muted">
-                <div className="text-sm text-muted-foreground mb-1">Monthly Income</div>
-                <div className="text-2xl font-bold">£{analysis.monthly_income.toFixed(0)}</div>
-              </div>
-              <div className="p-4 rounded-lg bg-muted">
-                <div className="text-sm text-muted-foreground mb-1">Monthly Expenses</div>
-                <div className="text-2xl font-bold">£{analysis.monthly_expenses.toFixed(0)}</div>
-              </div>
-              <div className="p-4 rounded-lg bg-muted">
-                <div className="text-sm text-muted-foreground mb-1">Total Debt</div>
-                <div className="text-2xl font-bold">£{analysis.debt_amount.toFixed(0)}</div>
-              </div>
+              <ComparisonMetric 
+                label="Monthly Income"
+                current={analysis.monthly_income}
+                previous={previousAnalysis?.monthly_income}
+                format="currency"
+              />
+              <ComparisonMetric 
+                label="Monthly Expenses"
+                current={analysis.monthly_expenses}
+                previous={previousAnalysis?.monthly_expenses}
+                format="currency"
+              />
+              <ComparisonMetric 
+                label="Total Debt"
+                current={analysis.debt_amount}
+                previous={previousAnalysis?.debt_amount}
+                format="currency"
+              />
             </div>
           </FinancialCard>
 
           <FinancialCard title="Key Ratios" gradient>
             <div className="space-y-4">
-              <div className="p-4 rounded-lg bg-muted">
-                <div className="text-sm text-muted-foreground mb-1">Credit Utilization</div>
-                <div className="text-2xl font-bold">{analysis.credit_utilization.toFixed(1)}%</div>
-              </div>
-              <div className="p-4 rounded-lg bg-muted">
-                <div className="text-sm text-muted-foreground mb-1">Debt-to-Income Ratio</div>
-                <div className="text-2xl font-bold">{analysis.debt_to_income_ratio.toFixed(1)}%</div>
-              </div>
+              <ComparisonMetric 
+                label="Credit Utilization"
+                current={analysis.credit_utilization}
+                previous={previousAnalysis?.credit_utilization}
+                format="percentage"
+              />
+              <ComparisonMetric 
+                label="Debt-to-Income Ratio"
+                current={analysis.debt_to_income_ratio}
+                previous={previousAnalysis?.debt_to_income_ratio}
+                format="percentage"
+              />
+              <ComparisonMetric 
+                label="Credit Score"
+                current={analysis.credit_score}
+                previous={previousAnalysis?.credit_score}
+                format="score"
+              />
             </div>
           </FinancialCard>
         </div>
