@@ -1,14 +1,84 @@
 import { BarChart3, TrendingUp, Shield, AlertCircle } from "lucide-react";
 import FinancialCard from "@/components/FinancialCard";
 import HealthMeter from "@/components/HealthMeter";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { Loader2 } from "lucide-react";
+
+interface FinancialAnalysis {
+  id: string;
+  monthly_income: number;
+  monthly_expenses: number;
+  credit_score: number;
+  debt_amount: number;
+  financial_score: number;
+  credit_utilization: number;
+  debt_to_income_ratio: number;
+  monthly_available: number;
+  recommendations: {
+    insights: string[];
+    actions: string[];
+  };
+}
 
 const Dashboard = () => {
-  // This would typically come from backend/state management
-  const hasAnalysis = false;
+  const [user, setUser] = useState<User | null>(null);
+  const [analysis, setAnalysis] = useState<FinancialAnalysis | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  if (!hasAnalysis) {
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
+
+      setUser(session.user);
+
+      // Fetch latest analysis
+      const { data, error } = await supabase
+        .from("financial_analyses")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        setAnalysis(data as unknown as FinancialAnalysis);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      if (!session) {
+        navigate("/auth");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!analysis) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -40,7 +110,6 @@ const Dashboard = () => {
     );
   }
 
-  // Example dashboard with data (would be populated from actual analysis)
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -53,14 +122,14 @@ const Dashboard = () => {
 
         <div className="grid md:grid-cols-3 gap-6">
           <FinancialCard title="Overall Health" gradient>
-            <HealthMeter score={75} label="Financial Score" size="lg" />
+            <HealthMeter score={analysis.financial_score} label="Financial Score" size="lg" />
           </FinancialCard>
 
           <FinancialCard title="Credit Status" gradient>
             <div className="space-y-4">
               <Shield className="w-8 h-8 text-warning" />
               <div>
-                <div className="text-2xl font-bold">720</div>
+                <div className="text-2xl font-bold">{analysis.credit_score}</div>
                 <div className="text-sm text-muted-foreground">Credit Score</div>
               </div>
             </div>
@@ -70,36 +139,72 @@ const Dashboard = () => {
             <div className="space-y-4">
               <TrendingUp className="w-8 h-8 text-success" />
               <div>
-                <div className="text-2xl font-bold">£600</div>
+                <div className="text-2xl font-bold">£{analysis.monthly_available.toFixed(0)}</div>
                 <div className="text-sm text-muted-foreground">Monthly Available</div>
               </div>
             </div>
           </FinancialCard>
         </div>
 
-        <FinancialCard title="Priority Actions" gradient>
-          <div className="space-y-4">
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-warning/10 border border-warning/20">
-              <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
-              <div>
-                <div className="font-semibold mb-1">Reduce Credit Utilization</div>
-                <p className="text-sm text-muted-foreground">
-                  Your credit utilization is at 48%. Paying off £400 could improve your score by ~20 points.
-                </p>
+        <div className="grid md:grid-cols-2 gap-6">
+          <FinancialCard title="Financial Metrics" gradient>
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="text-sm text-muted-foreground mb-1">Monthly Income</div>
+                <div className="text-2xl font-bold">£{analysis.monthly_income.toFixed(0)}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="text-sm text-muted-foreground mb-1">Monthly Expenses</div>
+                <div className="text-2xl font-bold">£{analysis.monthly_expenses.toFixed(0)}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="text-sm text-muted-foreground mb-1">Total Debt</div>
+                <div className="text-2xl font-bold">£{analysis.debt_amount.toFixed(0)}</div>
               </div>
             </div>
+          </FinancialCard>
 
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-success/10 border border-success/20">
-              <TrendingUp className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-              <div>
-                <div className="font-semibold mb-1">Start Investing</div>
-                <p className="text-sm text-muted-foreground">
-                  After improving your credit, invest £300/month in S&P 500 for steady growth.
-                </p>
+          <FinancialCard title="Key Ratios" gradient>
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="text-sm text-muted-foreground mb-1">Credit Utilization</div>
+                <div className="text-2xl font-bold">{analysis.credit_utilization.toFixed(1)}%</div>
+              </div>
+              <div className="p-4 rounded-lg bg-muted">
+                <div className="text-sm text-muted-foreground mb-1">Debt-to-Income Ratio</div>
+                <div className="text-2xl font-bold">{analysis.debt_to_income_ratio.toFixed(1)}%</div>
               </div>
             </div>
-          </div>
-        </FinancialCard>
+          </FinancialCard>
+        </div>
+
+        {analysis.recommendations?.insights && (
+          <FinancialCard title="Key Insights" gradient>
+            <ul className="space-y-3">
+              {analysis.recommendations.insights.map((insight, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-accent mt-2 flex-shrink-0" />
+                  <span className="text-muted-foreground">{insight}</span>
+                </li>
+              ))}
+            </ul>
+          </FinancialCard>
+        )}
+
+        {analysis.recommendations?.actions && (
+          <FinancialCard title="Priority Actions" gradient>
+            <ul className="space-y-3">
+              {analysis.recommendations.actions.map((action, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-success/10 text-success flex items-center justify-center flex-shrink-0 font-bold text-sm">
+                    {index + 1}
+                  </div>
+                  <span>{action}</span>
+                </li>
+              ))}
+            </ul>
+          </FinancialCard>
+        )}
       </div>
     </div>
   );

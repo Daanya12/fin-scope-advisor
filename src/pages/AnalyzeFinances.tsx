@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +8,7 @@ import FinancialCard from "@/components/FinancialCard";
 import HealthMeter from "@/components/HealthMeter";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { User } from "@supabase/supabase-js";
 import {
   Accordion,
   AccordionContent,
@@ -26,7 +28,21 @@ interface AnalysisResult {
 const AnalyzeFinances = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const [formData, setFormData] = useState({
     income: "",
@@ -47,10 +63,48 @@ const AnalyzeFinances = () => {
       if (error) throw error;
 
       setResult(data);
-      toast({
-        title: "Analysis Complete!",
-        description: "Your financial health report is ready.",
-      });
+
+      // Save to database if user is logged in
+      if (user) {
+        const monthlyAvailable = parseFloat(formData.income) - parseFloat(formData.expenses);
+        
+        const { error: saveError } = await supabase
+          .from("financial_analyses")
+          .insert({
+            user_id: user.id,
+            monthly_income: parseFloat(formData.income),
+            monthly_expenses: parseFloat(formData.expenses),
+            credit_score: formData.creditScore ? parseInt(formData.creditScore) : data.creditScore,
+            debt_amount: parseFloat(formData.debt),
+            financial_score: data.healthScore,
+            credit_utilization: data.creditUtilization,
+            debt_to_income_ratio: data.debtToIncomeRatio,
+            monthly_available: monthlyAvailable,
+            recommendations: {
+              insights: data.insights,
+              actions: data.recommendations
+            }
+          });
+
+        if (saveError) {
+          console.error("Error saving analysis:", saveError);
+          toast({
+            title: "Analysis Complete!",
+            description: "Analysis completed but couldn't be saved to dashboard.",
+          });
+        } else {
+          toast({
+            title: "Analysis Complete!",
+            description: "Your analysis has been saved to your dashboard.",
+          });
+          setTimeout(() => navigate("/dashboard"), 2000);
+        }
+      } else {
+        toast({
+          title: "Analysis Complete!",
+          description: "Sign in to save your results to the dashboard.",
+        });
+      }
     } catch (error) {
       console.error("Error analyzing finances:", error);
       toast({

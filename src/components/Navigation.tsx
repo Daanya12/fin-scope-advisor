@@ -1,9 +1,38 @@
 import { Link, useLocation } from "react-router-dom";
-import { TrendingUp, BarChart3, Home, Wallet } from "lucide-react";
+import { TrendingUp, BarChart3, Home, Wallet, LogOut, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 
 const Navigation = () => {
   const location = useLocation();
+  const [user, setUser] = useState<User | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been successfully signed out.",
+    });
+  };
 
   const links = [
     { to: "/", label: "Home", icon: Home },
@@ -25,27 +54,48 @@ const Navigation = () => {
             </span>
           </Link>
 
-          <div className="flex items-center gap-1">
-            {links.map((link) => {
-              const Icon = link.icon;
-              const isActive = location.pathname === link.to;
-              
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200",
-                    isActive
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="font-medium">{link.label}</span>
-                </Link>
-              );
-            })}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {links.map((link) => {
+                const Icon = link.icon;
+                const isActive = location.pathname === link.to;
+                
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200",
+                      isActive
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="font-medium">{link.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+            
+            {user ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </Button>
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <LogIn className="w-4 h-4" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
