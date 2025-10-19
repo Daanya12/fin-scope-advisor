@@ -130,7 +130,7 @@ const AnalyzeFinances = () => {
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 w-4 h-4" />
+                  <Sparkles className="mr-2 w-4 h-4 text-yellow" />
                   Analyze My Finances
                 </>
               )}

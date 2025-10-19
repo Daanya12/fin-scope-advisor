@@ -11,8 +11,8 @@ const Home = () => {
         <div className="absolute inset-0 gradient-primary opacity-5" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent border border-accent/20">
-              <Sparkles className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow/10 text-yellow-foreground border border-yellow/20">
+              <Sparkles className="w-4 h-4 text-yellow" />
               <span className="text-sm font-medium">AI-Powered Financial Intelligence</span>
             </div>
             
@@ -91,7 +91,7 @@ const Home = () => {
               gradient
             >
               <div className="space-y-4">
-                <Sparkles className="w-12 h-12 text-primary" />
+                <Sparkles className="w-12 h-12 text-yellow" />
                 <p className="text-sm text-muted-foreground">
                   Our AI connects the dots between your credit and investments, giving you clear,
                   actionable advice tailored to your situation.
