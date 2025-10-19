@@ -120,7 +120,7 @@ const AnalyzeFinances = () => {
 
             <Button
               type="submit"
-              className="w-full gradient-accent text-yellow-foreground font-semibold"
+              className="w-full gradient-primary text-primary-foreground"
               disabled={loading}
             >
               {loading ? (

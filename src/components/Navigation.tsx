@@ -17,10 +17,10 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-            <div className="w-8 h-8 rounded-lg gradient-accent flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="bg-gradient-to-r from-yellow via-accent to-yellow bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Lunex
             </span>
           </Link>
@@ -37,8 +37,8 @@ const Navigation = () => {
                   className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200",
                     isActive
-                      ? "bg-yellow text-yellow-foreground font-semibold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-yellow/10"
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
                   <Icon className="w-4 h-4" />
