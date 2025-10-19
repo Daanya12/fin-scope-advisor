@@ -11,7 +11,9 @@ serve(async (req) => {
   }
 
   try {
-    const { symbols, action } = await req.json();
+    // Read body once and reuse it
+    const body = await req.json();
+    const { symbols, action, query, riskAppetite, investmentGoal } = body;
 
     if (action === 'quote') {
       // Get current quotes for symbols
@@ -56,8 +58,6 @@ serve(async (req) => {
     }
 
     if (action === 'search') {
-      const { query } = await req.json();
-      
       const response = await fetch(
         `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`
       );
@@ -77,8 +77,6 @@ serve(async (req) => {
     }
 
     if (action === 'recommendations') {
-      const { riskAppetite, investmentGoal } = await req.json();
-      
       // Define recommendation pools based on risk and goals
       let symbolPool: string[] = [];
       
