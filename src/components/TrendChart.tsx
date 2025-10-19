@@ -17,7 +17,7 @@ const TrendChart = ({ data }: TrendChartProps) => {
           className="text-xs" 
           tick={{ fill: 'hsl(var(--muted-foreground))' }}
           label={{ 
-            value: 'Time', 
+            value: 'Month', 
             position: 'insideBottom', 
             offset: -5,
             style: { fill: 'hsl(var(--muted-foreground))', fontSize: '14px', fontWeight: 500 }
