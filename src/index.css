@@ -8,97 +8,97 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Main background - deep teal */
-    --background: 195 30% 12%;
-    --foreground: 180 100% 98%;
+    /* Main background - deep sage/charcoal */
+    --background: 140 15% 18%;
+    --foreground: 120 20% 95%;
 
-    /* Card surfaces with turquoise tint */
-    --card: 190 35% 16%;
-    --card-foreground: 180 100% 98%;
+    /* Card surfaces with sage tint */
+    --card: 135 18% 22%;
+    --card-foreground: 120 20% 95%;
 
     /* Popover surfaces */
-    --popover: 190 35% 16%;
-    --popover-foreground: 180 100% 98%;
+    --popover: 135 18% 22%;
+    --popover-foreground: 120 20% 95%;
 
-    /* Primary - Vibrant turquoise */
-    --primary: 180 80% 45%;
-    --primary-foreground: 195 30% 10%;
+    /* Primary - Sage green */
+    --primary: 130 30% 55%;
+    --primary-foreground: 140 15% 15%;
 
-    /* Secondary - Deep green */
-    --secondary: 160 60% 35%;
-    --secondary-foreground: 180 100% 98%;
+    /* Secondary - Muted sage */
+    --secondary: 135 20% 40%;
+    --secondary-foreground: 120 20% 95%;
 
-    /* Muted - Darker teal backgrounds */
-    --muted: 195 25% 18%;
-    --muted-foreground: 180 30% 70%;
+    /* Muted - Darker sage backgrounds */
+    --muted: 140 18% 25%;
+    --muted-foreground: 130 15% 70%;
 
-    /* Accent - Bright green */
-    --accent: 145 70% 50%;
-    --accent-foreground: 195 30% 10%;
+    /* Accent - Rich purple */
+    --accent: 270 60% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    /* Success - Lime green for positive metrics */
-    --success: 120 65% 55%;
-    --success-foreground: 195 30% 10%;
+    /* Success - Bright sage for positive metrics */
+    --success: 125 40% 60%;
+    --success-foreground: 140 15% 15%;
 
     /* Warning - Amber for alerts */
     --warning: 45 95% 55%;
-    --warning-foreground: 195 30% 10%;
+    --warning-foreground: 140 15% 15%;
 
     /* Destructive - Red for danger */
     --destructive: 0 75% 55%;
-    --destructive-foreground: 180 100% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs with turquoise hint */
-    --border: 185 25% 25%;
-    --input: 185 30% 22%;
-    --ring: 180 80% 45%;
+    /* Borders and inputs with sage hint */
+    --border: 135 20% 30%;
+    --input: 135 20% 28%;
+    --ring: 270 60% 60%;
 
     --radius: 0.75rem;
 
     /* Custom gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(180 80% 45%) 0%, hsl(145 70% 50%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(145 70% 50%) 0%, hsl(120 65% 55%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(190 35% 16%) 0%, hsl(185 30% 18%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(130 30% 55%) 0%, hsl(270 60% 60%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(125 40% 60%) 0%, hsl(130 30% 55%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(135 18% 22%) 0%, hsl(140 18% 24%) 100%);
   }
 
   .dark {
-    --background: 195 30% 8%;
-    --foreground: 180 100% 98%;
+    --background: 140 15% 12%;
+    --foreground: 120 20% 98%;
 
-    --card: 190 35% 12%;
-    --card-foreground: 180 100% 98%;
+    --card: 135 18% 16%;
+    --card-foreground: 120 20% 98%;
 
-    --popover: 190 35% 12%;
-    --popover-foreground: 180 100% 98%;
+    --popover: 135 18% 16%;
+    --popover-foreground: 120 20% 98%;
 
-    --primary: 180 80% 50%;
-    --primary-foreground: 195 30% 10%;
+    --primary: 130 30% 60%;
+    --primary-foreground: 140 15% 10%;
 
-    --secondary: 160 60% 30%;
-    --secondary-foreground: 180 100% 98%;
+    --secondary: 135 20% 35%;
+    --secondary-foreground: 120 20% 98%;
 
-    --muted: 195 25% 14%;
-    --muted-foreground: 180 30% 65%;
+    --muted: 140 18% 20%;
+    --muted-foreground: 130 15% 65%;
 
-    --accent: 145 70% 55%;
-    --accent-foreground: 195 30% 10%;
+    --accent: 270 60% 65%;
+    --accent-foreground: 0 0% 100%;
 
-    --success: 120 65% 60%;
-    --success-foreground: 195 30% 10%;
+    --success: 125 40% 65%;
+    --success-foreground: 140 15% 10%;
 
     --warning: 45 95% 60%;
-    --warning-foreground: 195 30% 10%;
+    --warning-foreground: 140 15% 10%;
 
     --destructive: 0 75% 60%;
-    --destructive-foreground: 180 100% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 185 25% 20%;
-    --input: 185 30% 18%;
-    --ring: 180 80% 50%;
+    --border: 135 20% 25%;
+    --input: 135 20% 22%;
+    --ring: 270 60% 65%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(180 80% 50%) 0%, hsl(145 70% 55%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(145 70% 55%) 0%, hsl(120 65% 60%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(190 35% 12%) 0%, hsl(185 30% 14%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(130 30% 60%) 0%, hsl(270 60% 65%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(125 40% 65%) 0%, hsl(130 30% 60%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(135 18% 16%) 0%, hsl(140 18% 18%) 100%);
   }
 }
 
@@ -127,17 +127,17 @@ All colors MUST be HSL.
   }
 
   .gradient-card {
-    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(185 30% 18%) 100%);
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(140 18% 24%) 100%);
   }
 
   .glass-effect {
-    background: rgba(20, 50, 60, 0.7);
+    background: rgba(60, 75, 65, 0.7);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(80, 200, 200, 0.2);
+    border: 1px solid rgba(150, 180, 160, 0.2);
   }
 
   .dark .glass-effect {
-    background: rgba(15, 40, 50, 0.8);
-    border: 1px solid rgba(80, 200, 200, 0.15);
+    background: rgba(40, 55, 45, 0.8);
+    border: 1px solid rgba(150, 180, 160, 0.15);
   }
 }
