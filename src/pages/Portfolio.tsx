@@ -87,6 +87,11 @@ const Portfolio = () => {
 
   const handlePortfolioCreated = async () => {
     // Refresh portfolios and holdings after creation
+    await refreshData();
+    setSettingUpPortfolio(null);
+  };
+
+  const refreshData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       const { data: portfolioData } = await supabase
@@ -108,7 +113,6 @@ const Portfolio = () => {
         setHoldings(holdingsData as Holding[]);
       }
     }
-    setSettingUpPortfolio(null);
   };
 
   const handleSetupPortfolio = (portfolioType: 'short-term' | 'long-term') => {
@@ -194,6 +198,9 @@ const Portfolio = () => {
               Manage your investments and track performance
             </p>
           </div>
+          <Button onClick={() => navigate('/trades')} variant="outline">
+            View Trade Journal
+          </Button>
         </div>
 
         <PortfolioTabs 
@@ -201,6 +208,7 @@ const Portfolio = () => {
           holdings={holdings}
           userId={user?.id || ''}
           onSetupPortfolio={handleSetupPortfolio}
+          onRefresh={refreshData}
         />
       </div>
     </div>

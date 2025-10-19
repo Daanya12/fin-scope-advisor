@@ -31,9 +31,10 @@ interface PortfolioTabsProps {
   holdings: Holding[];
   userId: string;
   onSetupPortfolio: (portfolioType: 'short-term' | 'long-term') => void;
+  onRefresh: () => void;
 }
 
-const PortfolioTabs = ({ portfolios, holdings, userId, onSetupPortfolio }: PortfolioTabsProps) => {
+const PortfolioTabs = ({ portfolios, holdings, userId, onSetupPortfolio, onRefresh }: PortfolioTabsProps) => {
   const shortTermPortfolio = portfolios.find(p => p.portfolio_type === 'short-term');
   const longTermPortfolio = portfolios.find(p => p.portfolio_type === 'long-term');
 
@@ -56,6 +57,8 @@ const PortfolioTabs = ({ portfolios, holdings, userId, onSetupPortfolio }: Portf
               holdings={getPortfolioHoldings(shortTermPortfolio.id)}
               riskAppetite={shortTermPortfolio.risk_appetite}
               portfolioType="short-term"
+              portfolioId={shortTermPortfolio.id}
+              onUpdate={onRefresh}
             />
             <RecommendedAssets
               riskAppetite={shortTermPortfolio.risk_appetite}
@@ -87,6 +90,8 @@ const PortfolioTabs = ({ portfolios, holdings, userId, onSetupPortfolio }: Portf
               holdings={getPortfolioHoldings(longTermPortfolio.id)}
               riskAppetite={longTermPortfolio.risk_appetite}
               portfolioType="long-term"
+              portfolioId={longTermPortfolio.id}
+              onUpdate={onRefresh}
             />
             <RecommendedAssets
               riskAppetite={longTermPortfolio.risk_appetite}

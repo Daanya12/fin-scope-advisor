@@ -136,6 +136,74 @@ export type Database = {
         }
         Relationships: []
       }
+      trades: {
+        Row: {
+          asset_name: string | null
+          created_at: string
+          entry_date: string
+          entry_price: number
+          exit_date: string | null
+          exit_price: number | null
+          id: string
+          notes: string | null
+          pnl: number | null
+          pnl_percent: number | null
+          portfolio_id: string | null
+          quantity: number
+          status: string
+          symbol: string
+          trade_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asset_name?: string | null
+          created_at?: string
+          entry_date: string
+          entry_price: number
+          exit_date?: string | null
+          exit_price?: number | null
+          id?: string
+          notes?: string | null
+          pnl?: number | null
+          pnl_percent?: number | null
+          portfolio_id?: string | null
+          quantity: number
+          status?: string
+          symbol: string
+          trade_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asset_name?: string | null
+          created_at?: string
+          entry_date?: string
+          entry_price?: number
+          exit_date?: string | null
+          exit_price?: number | null
+          id?: string
+          notes?: string | null
+          pnl?: number | null
+          pnl_percent?: number | null
+          portfolio_id?: string | null
+          quantity?: number
+          status?: string
+          symbol?: string
+          trade_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trades_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "user_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_holdings: {
         Row: {
           asset_type: string

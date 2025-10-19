@@ -1,6 +1,7 @@
 import FinancialCard from "@/components/FinancialCard";
 import { TrendingUp, TrendingDown, DollarSign, PieChart, Target, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { RiskAppetiteEditor } from "./RiskAppetiteEditor";
 
 interface Holding {
   symbol: string;
@@ -16,9 +17,11 @@ interface PortfolioOverviewProps {
   holdings: Holding[];
   riskAppetite: string;
   portfolioType: string;
+  portfolioId: string;
+  onUpdate: () => void;
 }
 
-const PortfolioOverview = ({ holdings, riskAppetite, portfolioType }: PortfolioOverviewProps) => {
+const PortfolioOverview = ({ holdings, riskAppetite, portfolioType, portfolioId, onUpdate }: PortfolioOverviewProps) => {
   const totalValue = holdings.reduce((sum, h) => sum + h.total_value, 0);
   const totalProfitLoss = holdings.reduce((sum, h) => sum + h.profit_loss, 0);
   const totalProfitLossPercent = totalValue > 0 ? (totalProfitLoss / (totalValue - totalProfitLoss)) * 100 : 0;
@@ -54,6 +57,11 @@ const PortfolioOverview = ({ holdings, riskAppetite, portfolioType }: PortfolioO
             </Badge>
             <div className="text-sm text-muted-foreground mt-2">Risk Appetite</div>
           </div>
+          <RiskAppetiteEditor 
+            portfolioId={portfolioId} 
+            currentRiskAppetite={riskAppetite}
+            onUpdate={onUpdate}
+          />
         </div>
       </FinancialCard>
 
